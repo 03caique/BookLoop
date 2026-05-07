@@ -1,26 +1,20 @@
 import { Feather } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-export default function Register() {
-  const [name, setName] = useState('');
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const handleRegister = async () => {
-    if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
       Alert.alert('Erro', 'Preencha todos os campos');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem');
       return;
     }
 
@@ -38,23 +32,24 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/users`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ email, password })
       });
 
       if (response.ok) {
-        Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
-        setName('');
+        const data = await response.json();
+        await AsyncStorage.setItem('token', data.token);
+        Alert.alert('Sucesso', 'Login feito com sucesso!');
         setEmail('');
         setPassword('');
-        setConfirmPassword('');
+        router.replace('/');
       } else {
-        let errorMessage = 'Erro ao cadastrar usuário';
+        let errorMessage = 'Erro ao tentar fazer login';
         
-        if (response.status === 409) {
-          errorMessage = 'Este e-mail já está cadastrado';
+        if (response.status === 401) {
+          errorMessage = 'E-mail ou senha inválidos';
         } else if (response.status === 400) {
           errorMessage = 'Dados inválidos. Verifique os campos e tente novamente';
         } else if (response.status === 500) {
@@ -78,21 +73,10 @@ export default function Register() {
       <View style={styles.container}>
         
         <View style={styles.header}>
-          <Text style={styles.title}>Crie Sua Conta</Text>
+          <Text style={styles.title}>Fazer Login</Text>
         </View>
 
         <View style={styles.formContainer}>
-          <View style={styles.inputContainer}>
-            <Feather name="user" size={20} color="#81C784" style={styles.icon} />
-            <TextInput
-              placeholder="Nome Completo"
-              placeholderTextColor="#A5D6A7"
-              value={name}
-              onChangeText={setName}
-              style={styles.input}
-              editable={!loading}
-            />
-          </View>
 
           <View style={styles.inputContainer}>
             <Feather name="mail" size={20} color="#81C784" style={styles.icon} />
@@ -130,21 +114,8 @@ export default function Register() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Feather name="lock" size={20} color="#81C784" style={styles.icon} />
-            <TextInput
-              placeholder="Confirmar Senha"
-              placeholderTextColor="#A5D6A7"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-              style={styles.input}
-              editable={!loading}
-            />
-          </View>
-
           <TouchableOpacity
-            onPress={handleRegister}
+            onPress={handleLogin}
             disabled={loading}
             style={[styles.button, loading && styles.buttonDisabled]}
           >
@@ -155,15 +126,15 @@ export default function Register() {
               style={styles.buttonGradient}
             >
               <Text style={styles.buttonText}>
-                {loading ? 'CADASTRANDO...' : 'CADASTRAR'}
+                {loading ? 'ENTRANDO...' : 'ENTRAR'}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Já tem uma conta? </Text>
-            <TouchableOpacity onPress={() => router.push('/login')}>
-              <Text style={styles.footerLink}>Entrar</Text>
+            <Text style={styles.footerText}>Ainda não possui uma conta? </Text>
+            <TouchableOpacity onPress={() => router.push('/register')}>
+              <Text style={styles.footerLink}>Cadastrar</Text>
             </TouchableOpacity>
           </View>
         </View>
