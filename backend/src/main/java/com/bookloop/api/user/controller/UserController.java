@@ -1,5 +1,6 @@
-package com.bookloop.api.user;
+package com.bookloop.api.user.controller;
 
+import com.bookloop.api.user.service.UserService;
 import com.bookloop.api.user.dto.UserRequestDTO;
 import com.bookloop.api.user.dto.UserResponseDTO;
 import jakarta.validation.Valid;
