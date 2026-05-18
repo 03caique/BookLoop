@@ -16,15 +16,15 @@ public class Book {
     private Long id;
 
     @NotBlank
-    private String titulo;
+    private String title;
 
     @NotBlank
-    private String autor;
+    private String author;
 
     private String isbn;
 
     @NotBlank
-    private String descricao;
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @NotNull

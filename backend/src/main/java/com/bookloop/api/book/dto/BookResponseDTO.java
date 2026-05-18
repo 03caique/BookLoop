@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class BookResponseDTO {
     private Long id;
-    private String titulo;
-    private String autor;
+    private String title;
+    private String author;
     private String isbn;
-    private String descricao;
+    private String description;
     private BookStatus status;
     private Long userId;
 }

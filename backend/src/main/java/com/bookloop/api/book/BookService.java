@@ -26,10 +26,10 @@ public class BookService {
 
         Book book = new Book();
 
-        book.setTitulo(dto.getTitulo());
-        book.setAutor(dto.getAutor());
+        book.setTitle(dto.getTitle());
+        book.setAuthor(dto.getAuthor());
         book.setIsbn(dto.getIsbn());
-        book.setDescricao(dto.getDescricao());
+        book.setDescription(dto.getDescription());
         book.setStatus(dto.getStatus());
 
         book.setUser(user);

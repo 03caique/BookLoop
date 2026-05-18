@@ -8,15 +8,15 @@ import lombok.Data;
 @Data
 public class BookRequestDTO {
     @NotBlank
-    private String titulo;
+    private String title;
 
     @NotBlank
-    private String autor;
+    private String author;
 
     private String isbn;
 
     @NotBlank
-    private String descricao;
+    private String description;
 
     @NotNull
     private BookStatus status;
