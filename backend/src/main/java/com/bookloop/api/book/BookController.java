@@ -33,4 +33,10 @@ public class BookController {
         return bookService.findByFilter(title, author, pageable);
     }
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookResponseDTO findById(@PathVariable Long id){
+        return bookService.findById(id);
+    }
+
 }

@@ -12,4 +12,5 @@ public class BookResponseDTO {
     private String description;
     private BookStatus status;
     private Long userId;
+    private String userName;
 }

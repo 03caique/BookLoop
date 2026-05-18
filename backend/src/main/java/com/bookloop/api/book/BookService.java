@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -58,5 +59,17 @@ public class BookService {
             dto.setUserId(book.getUser().getId());
             return dto;
         });
+    }
+
+    public BookResponseDTO findById(Long id){
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));
+
+        BookResponseDTO dto = modelMapper.map(book, BookResponseDTO.class);
+
+        dto.setUserId(book.getUser().getId());
+        dto.setUserName(book.getUser().getName());
+
+        return dto;
     }
 }
