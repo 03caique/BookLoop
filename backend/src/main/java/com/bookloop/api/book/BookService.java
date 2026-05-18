@@ -6,9 +6,13 @@ import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -38,5 +42,21 @@ public class BookService {
         responseDTO.setUserId(user.getId());
 
         return responseDTO;
+    }
+
+    public Page<BookResponseDTO> findByFilter(String title, String author, Pageable pageable){
+        List<BookStatus> status = List.of(BookStatus.DOACAO, BookStatus.TROCA);
+
+        Page<Book> books = bookRepository.findByStatusInAndTitleContainingIgnoreCaseAndAuthorContainingIgnoreCase(
+                status,
+                title,
+                author,
+                pageable);
+
+        return books.map(book -> {
+            BookResponseDTO dto = modelMapper.map(book, BookResponseDTO.class);
+            dto.setUserId(book.getUser().getId());
+            return dto;
+        });
     }
 }

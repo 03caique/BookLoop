@@ -4,6 +4,9 @@ import com.bookloop.api.book.dto.BookRequestDTO;
 import com.bookloop.api.book.dto.BookResponseDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,4 +22,15 @@ public class BookController {
     public BookResponseDTO create(@Valid @RequestBody BookRequestDTO dto){
         return bookService.create(dto);
     }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<BookResponseDTO> findByFilter(
+            @RequestParam(defaultValue = "") String title,
+            @RequestParam(defaultValue = "") String author,
+            @PageableDefault(size = 10) Pageable pageable
+    ){
+        return bookService.findByFilter(title, author, pageable);
+    }
+
 }
