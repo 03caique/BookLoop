@@ -37,6 +37,7 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
       <Link href="/register">Ir para cadastro</Link>
+      <Link href="/login">Ir para login</Link>
       <ThemedView style={styles.stepContainer}>
         <Link href="/modal">
           <Link.Trigger>

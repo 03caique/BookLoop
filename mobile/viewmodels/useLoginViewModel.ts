@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "../contexts/AuthContext";
 import { login } from "../services/authService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function useLoginViewModel() {
 
@@ -50,9 +51,15 @@ export function useLoginViewModel() {
 
       const response = await login({
         email,
-        password,});
+        password,
+      });
 
-        await signIn(response.token);
+      await signIn(response.token);
+
+      await AsyncStorage.setItem(
+        "userId",
+        String(response.userId)
+      );
 
       Alert.alert(
         "Sucesso",

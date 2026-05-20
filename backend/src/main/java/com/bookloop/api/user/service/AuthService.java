@@ -31,7 +31,11 @@ public class AuthService {
 
         String token = UUID.randomUUID().toString();
         LoginResponseDTO response = new LoginResponseDTO();
+
         response.setToken(token);
+        response.setUserId(user.getId());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
 
         return response;
     }
