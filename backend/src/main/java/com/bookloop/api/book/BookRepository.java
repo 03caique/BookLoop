@@ -8,9 +8,10 @@ import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    Page<Book> findByStatusInAndTitleContainingIgnoreCaseAndAuthorContainingIgnoreCase(
+    Page<Book> findByStatusInAndTitleContainingIgnoreCaseOrStatusInAndAuthorContainingIgnoreCase(
             List<BookStatus> status,
             String title,
+            List<BookStatus> status2,
             String author,
             Pageable pageable
     );

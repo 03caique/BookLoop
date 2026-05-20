@@ -26,17 +26,15 @@ public class BookController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<BookResponseDTO> findByFilter(
-            @RequestParam(defaultValue = "") String title,
-            @RequestParam(defaultValue = "") String author,
-            @PageableDefault(size = 10) Pageable pageable
-    ){
-        return bookService.findByFilter(title, author, pageable);
-    }
-
-    @GetMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public BookResponseDTO findById(@PathVariable Long id){
-        return bookService.findById(id);
+            @RequestParam(defaultValue = "")
+            String search,
+            @PageableDefault(size = 10)
+            Pageable pageable
+    ) {
+        return bookService.findByFilter(
+                search,
+                pageable
+        );
     }
 
 }

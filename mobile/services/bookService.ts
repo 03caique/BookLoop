@@ -26,3 +26,19 @@ export async function registerBook(
 
   return response.data;
 }
+
+export async function getBooks(
+  search = ""
+) {
+
+  const response = await api.get(
+    "/api/books",
+    {
+      params: {
+        search,
+      },
+    }
+  );
+
+  return response.data;
+}

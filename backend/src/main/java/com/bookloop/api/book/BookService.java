@@ -45,18 +45,26 @@ public class BookService {
         return responseDTO;
     }
 
-    public Page<BookResponseDTO> findByFilter(String title, String author, Pageable pageable){
+    public Page<BookResponseDTO> findByFilter(String search, Pageable pageable) {
+
         List<BookStatus> status = List.of(BookStatus.DOACAO, BookStatus.TROCA);
 
-        Page<Book> books = bookRepository.findByStatusInAndTitleContainingIgnoreCaseAndAuthorContainingIgnoreCase(
+        Page<Book> books = bookRepository.findByStatusInAndTitleContainingIgnoreCaseOrStatusInAndAuthorContainingIgnoreCase(
                 status,
-                title,
-                author,
-                pageable);
+                search,
+                status,
+                search,
+                pageable
+        );
 
-        return books.map(book -> {
-            BookResponseDTO dto = modelMapper.map(book, BookResponseDTO.class);
+        return books.map(book -> {BookResponseDTO dto = modelMapper.map(
+                    book,
+                    BookResponseDTO.class
+            );
+
             dto.setUserId(book.getUser().getId());
+            dto.setUserName(book.getUser().getName());
+
             return dto;
         });
     }
