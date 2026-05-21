@@ -15,10 +15,17 @@ from "expo-linear-gradient";
 import { useBookDetailsViewModel }
 from "../../viewmodels/useBookDetailsViewModel";
 
+import { TouchableOpacity }
+from "react-native";
+
+import { useBookRequestViewModel }
+from "../../viewmodels/useBookRequestViewModel";
+
 export default function BookDetails() {
 
-  const { id } =
-    useLocalSearchParams();
+  const { requestSent, errorMessage, handleRequestBook,} = useBookRequestViewModel();
+
+  const { id } = useLocalSearchParams();
 
   const {
     book,
@@ -110,6 +117,32 @@ export default function BookDetails() {
             {book.userName}
           </Text>
 
+          <TouchableOpacity style={[styles.button,requestSent && styles.buttonDisabled]} disabled={requestSent}
+            onPress={() => handleRequestBook(
+                book.id!,
+                book.userId!)}>
+
+            <Text style={styles.buttonText}>
+
+              {
+                requestSent
+                  ? "Solicitação enviada"
+                  : "Solicitar Interesse"
+              }
+
+            </Text>
+
+          </TouchableOpacity>
+          {
+            errorMessage
+            ? (
+                <Text style={styles.errorText}>
+                  {errorMessage}
+                </Text>
+              )
+            : null
+          }
+
         </View>
 
       </ScrollView>
@@ -157,5 +190,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     lineHeight: 24,
+  },
+
+  button: {
+    backgroundColor: "#66BB6A",
+    paddingVertical: 16,
+    borderRadius: 14,
+    alignItems: "center",
+    marginTop: 24,
+  },
+
+  buttonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  buttonDisabled: {
+    backgroundColor: "#999",
+  },
+
+  errorText: {
+    color: "#D32F2F",
+    marginTop: 12,
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });

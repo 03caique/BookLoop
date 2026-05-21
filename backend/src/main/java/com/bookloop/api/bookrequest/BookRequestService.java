@@ -34,6 +34,10 @@ public class BookRequestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não pode solicitar seu próprio livro");
         }
 
+        if (bookRequestRepository.existsByBookIdAndRequesterId(dto.getBookId(), dto.getRequesterId())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solicitação já enviada");
+        }
+
         BookRequest request = new BookRequest();
 
         request.setBook(book);
