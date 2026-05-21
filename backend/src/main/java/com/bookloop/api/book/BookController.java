@@ -37,4 +37,10 @@ public class BookController {
         );
     }
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public BookResponseDTO findById(@PathVariable Long id){
+        return bookService.findById(id);
+    }
+
 }

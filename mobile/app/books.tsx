@@ -14,6 +14,8 @@ from "expo-linear-gradient";
 import { useBooksViewModel }
 from "../viewmodels/useBooksViewModel";
 
+import { useRouter } from "expo-router";
+
 export default function Books() {
 
   const {
@@ -26,6 +28,8 @@ export default function Books() {
 
     loadBooks,
   } = useBooksViewModel();
+
+  const router = useRouter();
 
   return (
 
@@ -74,7 +78,7 @@ export default function Books() {
 
           renderItem={({ item }) => (
 
-            <View style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={() => router.push(`/book/${item.id}`)}>
 
               <Text style={styles.bookTitle}>
                 {item.title}
@@ -89,14 +93,18 @@ export default function Books() {
               </Text>
 
               <Text>
-                Tipo: {item.status}
+                Para: {
+                  item.status === "DOACAO"
+                    ? "Doação"
+                    : "Troca"
+                }
               </Text>
 
               <Text>
                 Dono: {item.userName}
               </Text>
 
-            </View>
+            </TouchableOpacity>
           )}
         />
       )}
