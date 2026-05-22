@@ -132,7 +132,7 @@ export default function Login() {
           <View style={styles.footer}>
 
             <Text style={styles.footerText}>
-              Ainda não possui uma conta?
+              Ainda não possui uma conta? 
             </Text>
 
             <TouchableOpacity
@@ -150,6 +150,12 @@ export default function Login() {
           </View>
 
         </View>
+
+        <View style={styles.blob1} />
+        <View style={styles.blobOutline1} />
+
+        <View style={styles.blob2}/>
+        <View style={styles.blobOutline2}/>
 
       </View>
     </LinearGradient>
@@ -177,6 +183,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#2E7D32',
     marginBottom: 8,
+
+    zIndex: 10,
+    elevation: 10,
   },
 
   subtitle: {
@@ -203,7 +212,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
 
-    elevation: 5,
+    zIndex: 10,
+    elevation: 10,
   },
 
   inputContainer: {
@@ -288,5 +298,103 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#26A69A',
     fontWeight: '600',
+  },
+
+  blob1: {
+    position: "absolute",
+
+    width: 220,
+    height: 220,
+
+    backgroundColor:
+      "rgba(38, 166, 154, 0.12)",
+
+    top: -40,
+    right: -60,
+
+    borderRadius: 80,
+
+    transform: [
+      { rotate: "15deg" }
+    ],
+
+    zIndex: 0,
+  },
+
+  blobOutline1: {
+    position: "absolute",
+
+    width: 220,
+    height: 220,
+
+    borderWidth: 2,
+
+    borderColor:
+      "rgba(38, 166, 154, 0.45)",
+
+    top: -48,
+    right: -52,
+
+    borderRadius: 90,
+
+    transform: [
+      { rotate: "8deg" }
+    ],
+
+    backgroundColor: "transparent",
+
+    zIndex: 0,
+  },
+
+  blob2: {
+    position: "absolute",
+
+    width: 260,
+    height: 260,
+
+    backgroundColor:
+      "rgba(102, 187, 106, 0.18)",
+
+    bottom: -80,
+    left: -90,
+
+    borderTopLeftRadius: 120,
+    borderTopRightRadius: 80,
+    borderBottomLeftRadius: 100,
+    borderBottomRightRadius: 140,
+
+    transform: [
+      { rotate: "-20deg" }
+    ],
+
+    zIndex: 0,
+  },
+
+  blobOutline2: {
+    position: "absolute",
+
+    width: 260,
+    height: 260,
+
+    borderWidth: 2,
+
+    borderColor:
+      "rgba(46, 125, 50, 0.5)",
+
+    bottom: -70,
+    left: -80,
+
+    borderTopLeftRadius: 100,
+    borderTopRightRadius: 120,
+    borderBottomLeftRadius: 140,
+    borderBottomRightRadius: 90,
+
+    transform: [
+      { rotate: "-10deg" }
+    ],
+
+    backgroundColor: "transparent",
+
+    zIndex: 0,
   },
 });
