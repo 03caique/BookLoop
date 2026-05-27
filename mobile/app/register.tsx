@@ -25,6 +25,17 @@ export default function Register() {
     >
       <View style={styles.container}>
 
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.push("/")}
+        >
+          <Feather
+            name="arrow-left"
+            size={24}
+            color="#2E7D32"
+          />
+        </TouchableOpacity>
+
         <View style={styles.header}>
           <Text style={styles.title}>
             Crie Sua Conta
@@ -185,7 +196,7 @@ export default function Register() {
             >
 
               <Text style={styles.footerLink}>
-                Entrar
+                {' '}Entrar
               </Text>
 
             </TouchableOpacity>
@@ -443,5 +454,27 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
 
     zIndex: 0,
+  },
+
+  backButton: {
+    position: "absolute",
+
+    top: 60,
+
+    left: 24,
+
+    width: 44,
+    height: 44,
+
+    borderRadius: 22,
+
+    backgroundColor: "rgba(255,255,255,0.8)",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    zIndex: 20,
+
+    elevation: 10,
   },
 });

@@ -1,25 +1,13 @@
-import { useEffect, useState }
-from "react";
+import { useEffect, useState } from "react";
+import { Alert } from "react-native";
+import { Book } from "../models/Book";
+import { getBooks } from "../services/bookService";
 
-import { Alert }
-from "react-native";
-
-import { Book }
-from "../models/Book";
-
-import { getBooks }
-from "../services/bookService";
-
-export function useBooksViewModel() {
-
-  const [books, setBooks] =
-    useState<Book[]>([]);
-
-  const [search, setSearch] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(false);
+export function useBooksViewModel(initialSearch = "") {
+  
+  const [books, setBooks] = useState<Book[]>([]);
+  const [search, setSearch] = useState(initialSearch); 
+  const [loading, setLoading] = useState(false);
 
   async function loadBooks() {
 

@@ -69,7 +69,7 @@ export function useLoginViewModel() {
       setEmail("");
       setPassword("");
 
-      router.replace("/");
+      router.replace("/home");
 
     } catch (error: any) {
 

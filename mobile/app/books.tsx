@@ -8,28 +8,28 @@ import {
   ActivityIndicator,
 } from "react-native";
 
+import { BottomNavigation } from "../components/BottomNavigation";
+
 import { LinearGradient }
 from "expo-linear-gradient";
 
 import { useBooksViewModel }
 from "../viewmodels/useBooksViewModel";
 
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 export default function Books() {
+  const router = useRouter();
+  
+  const { query } = useLocalSearchParams();
 
   const {
     books,
-
     search,
     setSearch,
-
     loading,
-
     loadBooks,
-  } = useBooksViewModel();
-
-  const router = useRouter();
+  } = useBooksViewModel((query as string) || "");
 
   return (
 
@@ -75,7 +75,9 @@ export default function Books() {
           keyExtractor={(item) =>
             item.id!.toString()
           }
-
+          contentContainerStyle={{
+            paddingBottom: 120,
+          }}
           renderItem={({ item }) => (
 
             <TouchableOpacity style={styles.card} onPress={() => router.push(`/book/${item.id}`)}>
@@ -108,6 +110,8 @@ export default function Books() {
           )}
         />
       )}
+
+      <BottomNavigation />
     </LinearGradient>
   );
 }
@@ -136,7 +140,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#26A69A",
+    backgroundColor: "#26a69a",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
