@@ -54,7 +54,12 @@ export function useLoginViewModel() {
         password,
       });
 
-      await signIn(response.token);
+      await signIn(
+        response.token,
+        response.userId,
+        response.name,
+        response.email
+      );
 
       await AsyncStorage.setItem(
         "userId",

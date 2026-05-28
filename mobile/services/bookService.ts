@@ -53,3 +53,14 @@ export async function getBookById(
 
   return response.data;
 }
+
+export async function getBooksByUser(
+  userId: number
+) {
+
+  const response = await api.get(
+    `/api/users/${userId}/books`
+  );
+
+  return response.data;
+}

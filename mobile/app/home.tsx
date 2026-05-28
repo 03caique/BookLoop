@@ -49,7 +49,7 @@ export default function Home() {
                 />
                 </TouchableOpacity>
 
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("/profile")}>
                 <Feather
                     name="user"
                     size={24}
@@ -92,7 +92,7 @@ export default function Home() {
                 <TouchableOpacity
                     key={book.id}
                     style={styles.bookCard}
-                    onPress={() => router.push(`/rbook/${book.id}`)}
+                    onPress={() => router.push(`/book/${book.id}`)}
                 >
 
                     <View style={styles.bookIcon}>

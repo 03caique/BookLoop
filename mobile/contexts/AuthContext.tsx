@@ -16,7 +16,18 @@ type AuthContextData = {
 
   token: string | null;
 
-  signIn: (token: string) => Promise<void>;
+  userId: number | null;
+
+  name: string;
+
+  email: string;
+
+  signIn: (
+    token: string,
+    userId: number,
+    name: string,
+    email: string
+  ) => Promise<void>;
 
   signOut: () => Promise<void>;
 };
@@ -36,6 +47,15 @@ export function AuthProvider({
 
   const [token, setToken] =
     useState<string | null>(null);
+
+  const [userId, setUserId] =
+    useState<number | null>(null);
+
+  const [name, setName] =
+    useState("");
+
+  const [email, setEmail] =
+    useState("");
 
   const [loading, setLoading] =
     useState(true);
@@ -69,7 +89,10 @@ export function AuthProvider({
   }
 
   async function signIn(
-    newToken: string
+    newToken: string,
+    newUserId: number,
+    newName: string,
+    newEmail: string
   ) {
 
     await AsyncStorage.setItem(
@@ -77,7 +100,25 @@ export function AuthProvider({
       newToken
     );
 
+    await AsyncStorage.setItem(
+      "userId",
+      String(newUserId)
+    );
+
+    await AsyncStorage.setItem(
+      "name",
+      newName
+    );
+
+    await AsyncStorage.setItem(
+      "email",
+      newEmail
+    );
+
     setToken(newToken);
+    setUserId(newUserId);
+    setName(newName);
+    setEmail(newEmail);
   }
 
   async function signOut() {
@@ -98,6 +139,12 @@ export function AuthProvider({
         loading,
 
         token,
+
+        userId,
+
+        name,
+
+        email,
 
         signIn,
 
