@@ -16,4 +16,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             Pageable pageable
     );
 
+    List<Book> findByUserId(Long userId);
+
 }

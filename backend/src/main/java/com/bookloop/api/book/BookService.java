@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -79,5 +80,17 @@ public class BookService {
         dto.setUserName(book.getUser().getName());
 
         return dto;
+    }
+
+    public List<BookResponseDTO> findByUserId(Long id){
+        if (!userRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        List<Book> books = bookRepository.findByUserId(id);
+
+        return books.stream()
+                .map(book -> modelMapper.map(book, BookResponseDTO.class))
+                .collect(Collectors.toList());
     }
 }
