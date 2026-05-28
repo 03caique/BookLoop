@@ -3,15 +3,14 @@ package com.bookloop.api.user.service;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import com.bookloop.api.user.dto.*;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.UUID;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class UserService {
@@ -51,7 +50,23 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        // TODO: validar usuário autenticado quando JWT estiver implementado
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        String email = authentication.getName();
+
+        User loggedUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        if (!loggedUser.getId().equals(id)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Você não pode editar outro usuário"
+            );
+        }
 
         if (updateDTO.getName() != null){
             user.setName(updateDTO.getName());

@@ -23,7 +23,12 @@ import {
   useProfileViewModel
 } from "../viewmodels/useProfileViewModel";
 
+import { useAuth }
+from "../contexts/AuthContext";
+
 export default function Profile() {
+
+  const { signOut } = useAuth();
 
   const vm =
     useProfileViewModel();
@@ -202,6 +207,12 @@ export default function Profile() {
 
             <TouchableOpacity
               style={styles.menuItem}
+              onPress={async () => {
+
+                await signOut();
+
+                router.replace("/welcome");
+              }}
             >
 
               <View style={styles.menuLeft}>

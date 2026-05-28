@@ -73,8 +73,30 @@ export function AuthProvider({
       const storedToken =
         await AsyncStorage.getItem("token");
 
+      const storedUserId =
+        await AsyncStorage.getItem("userId");
+
+      const storedName =
+        await AsyncStorage.getItem("name");
+
+      const storedEmail =
+        await AsyncStorage.getItem("email");
+
       if (storedToken) {
+
         setToken(storedToken);
+
+        if (storedUserId) {
+          setUserId(Number(storedUserId));
+        }
+
+        if (storedName) {
+          setName(storedName);
+        }
+
+        if (storedEmail) {
+          setEmail(storedEmail);
+        }
       }
 
     } catch (error) {
@@ -123,11 +145,17 @@ export function AuthProvider({
 
   async function signOut() {
 
-    await AsyncStorage.removeItem(
-      "token"
-    );
+    await AsyncStorage.multiRemove([
+      "token",
+      "userId",
+      "name",
+      "email",
+    ]);
 
     setToken(null);
+    setUserId(null);
+    setName("");
+    setEmail("");
   }
 
   return (
