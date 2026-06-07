@@ -1,10 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 
-import { LinearGradient }
-from "expo-linear-gradient";
+import { LinearGradient } from "expo-linear-gradient";
 
 import {
   ActivityIndicator,
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,92 +13,70 @@ import {
   View,
 } from "react-native";
 
-import { router }
-from "expo-router";
+import { router } from "expo-router";
 
-import { BottomNavigation }
-from "../components/BottomNavigation";
+import { BottomNavigation } from "../components/BottomNavigation";
 
-import {
-  useProfileViewModel
-} from "../viewmodels/useProfileViewModel";
+import { useProfileViewModel } from "../viewmodels/useProfileViewModel";
 
-import { useAuth }
-from "../contexts/AuthContext";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Profile() {
-
   const { signOut } = useAuth();
 
-  const vm =
-    useProfileViewModel();
+  const vm = useProfileViewModel();
+
+  async function handleLogout() {
+    Alert.alert("Sair", "Tem certeza que deseja sair da sua conta?", [
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+      {
+        text: "Sair",
+        style: "destructive",
+        onPress: async () => {
+          await signOut();
+
+          router.replace("/welcome");
+        },
+      },
+    ]);
+  }
 
   if (vm.loading) {
-
     return (
-
       <View style={styles.loadingContainer}>
-
         <ActivityIndicator size="large" />
-
       </View>
     );
   }
 
   return (
-
     <LinearGradient
-      colors={[
-        "#E8F5E9",
-        "#F1F8E9",
-        "#FFFFFF",
-      ]}
+      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
       style={styles.container}
     >
-
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-
         <View style={styles.header}>
-
-          <TouchableOpacity
-            onPress={() =>
-              router.back()
-            }
-          >
-
-            <Feather
-              name="arrow-left"
-              size={30}
-              color="#2E7D32"
-            />
-
+          <TouchableOpacity onPress={() => router.back()}>
+            <Feather name="arrow-left" size={30} color="#2E7D32" />
           </TouchableOpacity>
 
-          <Text style={styles.title}>
-            Meu Perfil
-          </Text>
+          <Text style={styles.title}>Meu Perfil</Text>
 
           <View style={{ width: 30 }} />
-
         </View>
 
         <View style={styles.profileSection}>
-
           <View style={styles.avatar}>
-
-            <Feather
-              name="user"
-              size={70}
-              color="#2E7D32"
-            />
-
+            <Feather name="user" size={70} color="#2E7D32" />
           </View>
 
           {vm.editing ? (
-
             <>
               <TextInput
                 value={vm.name}
@@ -117,184 +95,105 @@ export default function Profile() {
               <TouchableOpacity
                 style={styles.saveButton}
                 onPress={async () => {
-
                   await vm.handleUpdate();
 
                   vm.setEditing(false);
                 }}
               >
-
-                <Text style={styles.saveButtonText}>
-                  SALVAR
-                </Text>
-
+                <Text style={styles.saveButtonText}>SALVAR</Text>
               </TouchableOpacity>
             </>
-
           ) : (
-
             <>
-              <Text style={styles.name}>
-                {vm.name}
-              </Text>
+              <Text style={styles.name}>{vm.name}</Text>
 
-              <Text style={styles.email}>
-                {vm.email}
-              </Text>
+              <Text style={styles.email}>{vm.email}</Text>
             </>
           )}
-
         </View>
 
         {!vm.editing && (
-
           <View style={styles.menuContainer}>
-
             <TouchableOpacity
               style={styles.menuItem}
-              onPress={() =>
-                vm.setEditing(true)
-              }
+              onPress={() => vm.setEditing(true)}
             >
-
               <View style={styles.menuLeft}>
+                <Feather name="edit-2" size={22} color="#2E7D32" />
 
-                <Feather
-                  name="edit-2"
-                  size={22}
-                  color="#2E7D32"
-                />
-
-                <Text style={styles.menuText}>
-                  Editar Perfil
-                </Text>
-
+                <Text style={styles.menuText}>Editar Perfil</Text>
               </View>
 
-              <Feather
-                name="chevron-right"
-                size={22}
-                color="#999"
-              />
-
+              <Feather name="chevron-right" size={22} color="#999" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.menuItem}
+              onPress={() => router.push("/socioeconomic-profile")}
             >
-
               <View style={styles.menuLeft}>
+                <Feather name="bar-chart-2" size={22} color="#2E7D32" />
 
-                <Feather
-                  name="repeat"
-                  size={22}
-                  color="#2E7D32"
-                />
-
-                <Text style={styles.menuText}>
-                  Minhas solicitações
-                </Text>
-
+                <Text style={styles.menuText}>Perfil Socioeconômico</Text>
               </View>
 
-              <Feather
-                name="chevron-right"
-                size={22}
-                color="#999"
-              />
+              <Feather name="chevron-right" size={22} color="#999" />
+            </TouchableOpacity>
 
+            <TouchableOpacity style={styles.menuItem}>
+              <View style={styles.menuLeft}>
+                <Feather name="repeat" size={22} color="#2E7D32" />
+
+                <Text style={styles.menuText}>Minhas solicitações</Text>
+              </View>
+
+              <Feather name="chevron-right" size={22} color="#999" />
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.menuItem}
-              onPress={async () => {
-
-                await signOut();
-
-                router.replace("/welcome");
-              }}
+              onPress={handleLogout}
             >
-
               <View style={styles.menuLeft}>
+                <Feather name="log-out" size={22} color="#D32F2F" />
 
-                <Feather
-                  name="log-out"
-                  size={22}
-                  color="#D32F2F"
-                />
-
-                <Text
-                  style={[
-                    styles.menuText,
-                    { color: "#D32F2F" }
-                  ]}
-                >
+                <Text style={[styles.menuText, { color: "#D32F2F" }]}>
                   Sair
                 </Text>
-
               </View>
-
             </TouchableOpacity>
-
           </View>
         )}
 
-        <Text style={styles.booksTitle}>
-          Meus Livros
-        </Text>
+        <Text style={styles.booksTitle}>Meus Livros</Text>
 
         {vm.books.map((book) => (
-
-          <View
-            key={book.id}
-            style={styles.bookCard}>
-
+          <View key={book.id} style={styles.bookCard}>
             <View style={styles.bookImage}>
-
-              <Feather
-                name="book"
-                size={40}
-                color="#2E7D32"/>
-
+              <Feather name="book" size={40} color="#2E7D32" />
             </View>
 
             <View style={styles.bookInfo}>
+              <Text style={styles.bookTitle}>{book.title}</Text>
 
-              <Text style={styles.bookTitle}>
-                {book.title}
-              </Text>
+              <Text style={styles.bookText}>{book.author}</Text>
 
-              <Text style={styles.bookText}>
-                {book.author}
-              </Text>
+              <Text style={styles.bookText}>ISBN: {book.isbn}</Text>
 
               <Text style={styles.bookText}>
-                ISBN: {book.isbn}
+                {book.status === "DOACAO" ? "Para doação" : "Para troca"}
               </Text>
-
-              <Text style={styles.bookText}>
-
-                {book.status === "DOACAO"
-                  ? "Para doação"
-                  : "Para troca"}
-
-              </Text>
-
             </View>
-
           </View>
         ))}
-
       </ScrollView>
 
       <BottomNavigation />
-
     </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
   },
@@ -331,7 +230,6 @@ const styles = StyleSheet.create({
   },
 
   avatar: {
-
     width: 140,
     height: 140,
 
@@ -452,7 +350,6 @@ const styles = StyleSheet.create({
   },
 
   bookImage: {
-
     width: 100,
     height: 130,
 
@@ -482,5 +379,4 @@ const styles = StyleSheet.create({
     color: "#555",
     marginBottom: 4,
   },
-
 });
