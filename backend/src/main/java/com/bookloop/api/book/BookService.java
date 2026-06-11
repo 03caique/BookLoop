@@ -99,4 +99,34 @@ public class BookService {
                 .map(book -> modelMapper.map(book, BookResponseDTO.class))
                 .collect(Collectors.toList());
     }
+
+    public BookResponseDTO update(Long bookId, BookRequestDTO requestDTO){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+        User loggedUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));
+
+        if (!book.getUser().getId().equals(loggedUser.getId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário não possui permissão para editar este livro");
+        }
+
+        book.setTitle(requestDTO.getTitle());
+        book.setAuthor(requestDTO.getAuthor());
+        book.setIsbn(requestDTO.getIsbn());
+        book.setDescription(requestDTO.getDescription());
+        book.setStatus(requestDTO.getStatus());
+
+        Book updatedBook = bookRepository.save(book);
+
+        BookResponseDTO responseDTO = modelMapper.map(updatedBook, BookResponseDTO.class);
+
+        responseDTO.setUserId(updatedBook.getUser().getId());
+        responseDTO.setUserName(updatedBook.getUser().getName());
+
+        return responseDTO;
+    }
 }
