@@ -9,6 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,8 +29,12 @@ public class BookService {
 
     public BookResponseDTO create(BookRequestDTO dto){
 
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String email = authentication.getName();
+
+        User loggedUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
         Book book = new Book();
 
@@ -38,10 +44,10 @@ public class BookService {
         book.setDescription(dto.getDescription());
         book.setStatus(dto.getStatus());
 
-        book.setUser(user);
+        book.setUser(loggedUser);
         Book savedBook = bookRepository.save(book);
         BookResponseDTO responseDTO = modelMapper.map(savedBook, BookResponseDTO.class);
-        responseDTO.setUserId(user.getId());
+        responseDTO.setUserId(loggedUser.getId());
 
         return responseDTO;
     }

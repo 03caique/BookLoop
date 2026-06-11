@@ -5,6 +5,5 @@ export interface Book {
   isbn: string;
   description: string;
   status: "DOACAO" | "TROCA";
-  userId?: number;
   userName?: string;
 }

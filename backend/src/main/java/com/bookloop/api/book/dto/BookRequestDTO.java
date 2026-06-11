@@ -21,7 +21,4 @@ public class BookRequestDTO {
     @NotNull
     private BookStatus status;
 
-    @NotNull
-    private Long userId;
-
 }
