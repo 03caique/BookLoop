@@ -8,7 +8,11 @@ public class BookRequestResponseDTO {
 
     private Long id;
     private BookRequestStatus status;
+
     private Long bookId;
+    private String bookTitle;
+
     private Long requesterId;
+    private String requesterName;
 
 }
