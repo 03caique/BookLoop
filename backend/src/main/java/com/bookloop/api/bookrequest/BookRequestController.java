@@ -2,6 +2,7 @@ package com.bookloop.api.bookrequest;
 
 import com.bookloop.api.bookrequest.dto.BookRequestRequestDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestResponseDTO;
+import com.bookloop.api.bookrequest.dto.BookRequestUpdateDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,5 +26,10 @@ public class BookRequestController {
     @GetMapping
     public Page<BookRequestResponseDTO> findByProponent(@RequestParam Long proponentId, Pageable pageable) {
         return bookRequestService.findByProponent(proponentId, pageable);
+    }
+
+    @PutMapping("/{id}")
+    public BookRequestResponseDTO updateStatus(@PathVariable Long id, @Valid @RequestBody BookRequestUpdateDTO dto) {
+        return bookRequestService.updateStatus(id, dto);
     }
 }
