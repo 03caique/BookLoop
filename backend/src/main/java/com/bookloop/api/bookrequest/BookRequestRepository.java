@@ -4,6 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface BookRequestRepository extends JpaRepository<BookRequest, Long> {
     boolean existsByBookIdAndRequesterId(
         Long bookId,
@@ -14,6 +16,12 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
             Long proponentId,
             BookRequestStatus status,
             Pageable pageable
+    );
+
+    Optional<BookRequest> findByRequesterIdAndBookUserIdAndStatus(
+            Long requesterId,
+            Long bookOwnerId,
+            BookRequestStatus status
     );
 
 }

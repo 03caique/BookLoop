@@ -5,6 +5,7 @@ import com.bookloop.api.book.BookRepository;
 import com.bookloop.api.bookrequest.dto.BookRequestRequestDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestResponseDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestUpdateDTO;
+import com.bookloop.api.match.MatchService;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class BookRequestService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final MatchService matchService;
 
     public BookRequestResponseDTO create(BookRequestRequestDTO dto) {
 
@@ -95,6 +97,10 @@ public class BookRequestService {
         bookRequest.setStatus(updateDTO.getStatus());
 
         BookRequest updatedRequest = bookRequestRepository.save(bookRequest);
+
+        if (updatedRequest.getStatus() == BookRequestStatus.ACEITA) {
+            matchService.checkForMatch(updatedRequest);
+        }
 
         BookRequestResponseDTO responseDTO = modelMapper.map(updatedRequest, BookRequestResponseDTO.class);
 
