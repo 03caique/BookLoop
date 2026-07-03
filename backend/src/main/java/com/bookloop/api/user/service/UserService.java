@@ -1,8 +1,10 @@
 package com.bookloop.api.user.service;
 
+import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import com.bookloop.api.user.dto.*;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,17 +15,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
-
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, ModelMapper modelMapper) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.modelMapper = modelMapper;
-    }
+    private final LoggedUserService loggedUserService;
 
     public UserResponseDTO createUser(UserRequestDTO dto){
         if (userRepository.existsByEmail(dto.getEmail())) {
@@ -50,15 +48,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-        String email = authentication.getName();
-
-        User loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        User loggedUser = loggedUserService.getLoggedUser();
 
         if (!loggedUser.getId().equals(id)) {
 

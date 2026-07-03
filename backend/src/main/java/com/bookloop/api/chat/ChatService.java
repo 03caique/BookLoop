@@ -5,6 +5,7 @@ import com.bookloop.api.chat.dto.MessageRequestDTO;
 import com.bookloop.api.chat.dto.MessageResponseDTO;
 import com.bookloop.api.match.MatchRepository;
 import com.bookloop.api.match.MatchService;
+import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -29,13 +30,10 @@ public class ChatService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final MatchRepository matchRepository;
+    private final LoggedUserService loggedUserService;
 
     public MessageResponseDTO create(MessageRequestDTO requestDTO){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String email = authentication.getName();
-        User loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        User loggedUser = loggedUserService.getLoggedUser();
 
         User receiver = userRepository.findById(requestDTO.getReceiverId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
@@ -69,11 +67,7 @@ public class ChatService {
     }
 
     public Page<MessageResponseDTO> findConversation(Long userId, Pageable pageable) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String email = authentication.getName();
-        User loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        User loggedUser = loggedUserService.getLoggedUser();
 
         User receiver = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));

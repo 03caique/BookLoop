@@ -2,6 +2,7 @@ package com.bookloop.api.book;
 
 import com.bookloop.api.book.dto.BookRequestDTO;
 import com.bookloop.api.book.dto.BookResponseDTO;
+import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -26,15 +27,10 @@ public class BookService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final LoggedUserService loggedUserService;
 
     public BookResponseDTO create(BookRequestDTO dto){
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String email = authentication.getName();
-
-        User loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        User loggedUser = loggedUserService.getLoggedUser();
 
         Book book = new Book();
 
@@ -101,11 +97,7 @@ public class BookService {
     }
 
     public BookResponseDTO update(Long bookId, BookRequestDTO requestDTO){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String email = authentication.getName();
-        User loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        User loggedUser = loggedUserService.getLoggedUser();
 
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));

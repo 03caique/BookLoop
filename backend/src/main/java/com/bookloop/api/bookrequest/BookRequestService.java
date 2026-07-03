@@ -6,6 +6,7 @@ import com.bookloop.api.bookrequest.dto.BookRequestRequestDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestResponseDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestUpdateDTO;
 import com.bookloop.api.match.MatchService;
+import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -29,11 +30,11 @@ public class BookRequestService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final MatchService matchService;
+    private final LoggedUserService loggedUserService;
 
     public BookRequestResponseDTO create(BookRequestRequestDTO dto) {
 
         Book book = bookRepository.findById(dto.getBookId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));
-
 
         User requester = userRepository.findById(dto.getRequesterId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
@@ -80,12 +81,7 @@ public class BookRequestService {
     }
 
     public BookRequestResponseDTO updateStatus(Long bookRequestId, BookRequestUpdateDTO updateDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        String email = authentication.getName();
-
-        User loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        User loggedUser = loggedUserService.getLoggedUser();
 
         BookRequest bookRequest = bookRequestRepository.findById(bookRequestId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitação não encontrada"));

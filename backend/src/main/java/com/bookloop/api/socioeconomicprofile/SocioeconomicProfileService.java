@@ -1,5 +1,6 @@
 package com.bookloop.api.socioeconomicprofile;
 
+import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.socioeconomicprofile.dto.SocioeconomicProfileRequestDTO;
 import com.bookloop.api.socioeconomicprofile.dto.SocioeconomicProfileResponseDTO;
 import com.bookloop.api.user.User;
@@ -21,16 +22,10 @@ public class SocioeconomicProfileService {
     private final SocioeconomicProfileRepository repository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final LoggedUserService loggedUserService;
 
     public SocioeconomicProfileResponseDTO create(SocioeconomicProfileRequestDTO dto){
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-        String email = authentication.getName();
-
-        User loggedUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
+        User loggedUser = loggedUserService.getLoggedUser();
 
         if (repository.existsByUserId(loggedUser.getId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um perfil socioeconomico para esse usuário");
