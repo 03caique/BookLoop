@@ -2,6 +2,7 @@ package com.bookloop.api.book;
 
 import com.bookloop.api.book.dto.BookRequestDTO;
 import com.bookloop.api.book.dto.BookResponseDTO;
+import com.bookloop.api.book.photo.BookPhoto;
 import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
@@ -32,6 +33,10 @@ public class BookService {
     public BookResponseDTO create(BookRequestDTO dto){
         User loggedUser = loggedUserService.getLoggedUser();
 
+        if (dto.getPhotos() == null || dto.getPhotos().size() < 3) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O livro deve possuir pelo menos 3 fotos.");
+        }
+
         Book book = new Book();
 
         book.setTitle(dto.getTitle());
@@ -39,11 +44,24 @@ public class BookService {
         book.setIsbn(dto.getIsbn());
         book.setDescription(dto.getDescription());
         book.setStatus(dto.getStatus());
-
         book.setUser(loggedUser);
+
+        List<BookPhoto> photos = dto.getPhotos()
+                .stream()
+                .map(url -> {
+                    BookPhoto photo = new BookPhoto();
+                    photo.setImageUrl(url);
+                    photo.setBook(book);
+                    return photo;
+                })
+                .collect(Collectors.toList());
+
+        book.setPhotos(photos);
+
         Book savedBook = bookRepository.save(book);
         BookResponseDTO responseDTO = modelMapper.map(savedBook, BookResponseDTO.class);
         responseDTO.setUserId(loggedUser.getId());
+        responseDTO.setUserName(loggedUser.getName());
 
         return responseDTO;
     }

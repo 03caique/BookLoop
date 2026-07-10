@@ -2,6 +2,7 @@ package com.bookloop.api.book.dto;
 
 import com.bookloop.api.book.BookStatus;
 import lombok.Data;
+import java.util.List;
 
 @Data
 public class BookResponseDTO {
@@ -13,4 +14,5 @@ public class BookResponseDTO {
     private BookStatus status;
     private Long userId;
     private String userName;
+    private List<BookPhotoResponseDTO> photos;
 }

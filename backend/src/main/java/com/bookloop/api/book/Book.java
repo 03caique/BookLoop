@@ -1,10 +1,14 @@
 package com.bookloop.api.book;
 
+import com.bookloop.api.book.photo.BookPhoto;
 import com.bookloop.api.user.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -34,5 +38,8 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookPhoto> photos = new ArrayList<>();
 
 }
