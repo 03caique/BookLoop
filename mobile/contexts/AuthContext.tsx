@@ -9,7 +9,6 @@ import {
 } from "react";
 
 type AuthContextData = {
-
   authenticated: boolean;
 
   loading: boolean;
@@ -26,64 +25,44 @@ type AuthContextData = {
     token: string,
     userId: number,
     name: string,
-    email: string
+    email: string,
   ) => Promise<void>;
 
   signOut: () => Promise<void>;
 };
 
-const AuthContext =
-  createContext<AuthContextData>(
-    {} as AuthContextData
-  );
+const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 type Props = {
   children: ReactNode;
 };
 
-export function AuthProvider({
-  children,
-}: Props) {
+export function AuthProvider({ children }: Props) {
+  const [token, setToken] = useState<string | null>(null);
 
-  const [token, setToken] =
-    useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
-  const [userId, setUserId] =
-    useState<number | null>(null);
+  const [name, setName] = useState("");
 
-  const [name, setName] =
-    useState("");
+  const [email, setEmail] = useState("");
 
-  const [email, setEmail] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     loadToken();
-
   }, []);
 
   async function loadToken() {
-
     try {
+      const storedToken = await AsyncStorage.getItem("token");
 
-      const storedToken =
-        await AsyncStorage.getItem("token");
+      const storedUserId = await AsyncStorage.getItem("userId");
 
-      const storedUserId =
-        await AsyncStorage.getItem("userId");
+      const storedName = await AsyncStorage.getItem("name");
 
-      const storedName =
-        await AsyncStorage.getItem("name");
-
-      const storedEmail =
-        await AsyncStorage.getItem("email");
+      const storedEmail = await AsyncStorage.getItem("email");
 
       if (storedToken) {
-
         setToken(storedToken);
 
         if (storedUserId) {
@@ -98,15 +77,10 @@ export function AuthProvider({
           setEmail(storedEmail);
         }
       }
-
     } catch (error) {
-
       console.log(error);
-
     } finally {
-
       setLoading(false);
-
     }
   }
 
@@ -114,28 +88,15 @@ export function AuthProvider({
     newToken: string,
     newUserId: number,
     newName: string,
-    newEmail: string
+    newEmail: string,
   ) {
+    await AsyncStorage.setItem("token", newToken);
 
-    await AsyncStorage.setItem(
-      "token",
-      newToken
-    );
+    await AsyncStorage.setItem("userId", String(newUserId));
 
-    await AsyncStorage.setItem(
-      "userId",
-      String(newUserId)
-    );
+    await AsyncStorage.setItem("name", newName);
 
-    await AsyncStorage.setItem(
-      "name",
-      newName
-    );
-
-    await AsyncStorage.setItem(
-      "email",
-      newEmail
-    );
+    await AsyncStorage.setItem("email", newEmail);
 
     setToken(newToken);
     setUserId(newUserId);
@@ -144,13 +105,7 @@ export function AuthProvider({
   }
 
   async function signOut() {
-
-    await AsyncStorage.multiRemove([
-      "token",
-      "userId",
-      "name",
-      "email",
-    ]);
+    await AsyncStorage.multiRemove(["token", "userId", "name", "email"]);
 
     setToken(null);
     setUserId(null);
@@ -159,7 +114,6 @@ export function AuthProvider({
   }
 
   return (
-
     <AuthContext.Provider
       value={{
         authenticated: !!token,
@@ -179,9 +133,7 @@ export function AuthProvider({
         signOut,
       }}
     >
-
       {children}
-
     </AuthContext.Provider>
   );
 }

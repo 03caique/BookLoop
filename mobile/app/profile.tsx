@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import {
   ActivityIndicator,
   Alert,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -27,6 +28,12 @@ export default function Profile() {
   const vm = useProfileViewModel();
 
   async function handleLogout() {
+    if (Platform.OS === "web") {
+      await signOut();
+      router.replace("/welcome");
+      return;
+    }
+
     Alert.alert("Sair", "Tem certeza que deseja sair da sua conta?", [
       {
         text: "Cancelar",
@@ -37,7 +44,6 @@ export default function Profile() {
         style: "destructive",
         onPress: async () => {
           await signOut();
-
           router.replace("/welcome");
         },
       },
@@ -150,13 +156,9 @@ export default function Profile() {
               <Feather name="chevron-right" size={22} color="#999" />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.menuItem}
-              onPress={handleLogout}
-            >
+            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
               <View style={styles.menuLeft}>
                 <Feather name="log-out" size={22} color="#D32F2F" />
-
                 <Text style={[styles.menuText, { color: "#D32F2F" }]}>
                   Sair
                 </Text>
