@@ -1,6 +1,24 @@
-export interface BookRequest {
+export type BookRequestStatus="PENDENTE" | "ACEITA" | "RECUSADA";
 
-  bookId: number;
+export interface BookRequestResponseDTO{
+  id: number;
+  status: BookRequestStatus:
 
-  requesterId: number;
+  bookTitle: string;
+  requesterName: string;
+}
+
+export interface BookRequestUpdateDTO{
+  status: Exclude<BookRequestStatus,"PENDENTE">;
+}
+
+export interface PageResponse<T>{
+  content: T[];
+
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean
 }
