@@ -1,7 +1,6 @@
 import { Feather } from "@expo/vector-icons";
-
 import { LinearGradient } from "expo-linear-gradient";
-
+import { router } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -13,14 +12,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import { router } from "expo-router";
-
+import { BookCard } from "../components/BookCard";
 import { BottomNavigation } from "../components/BottomNavigation";
-
-import { useProfileViewModel } from "../viewmodels/useProfileViewModel";
-
 import { useAuth } from "../contexts/AuthContext";
+import { useProfileViewModel } from "../viewmodels/useProfileViewModel";
 
 export default function Profile() {
   const { signOut } = useAuth();
@@ -170,23 +165,11 @@ export default function Profile() {
         <Text style={styles.booksTitle}>Meus Livros</Text>
 
         {vm.books.map((book) => (
-          <View key={book.id} style={styles.bookCard}>
-            <View style={styles.bookImage}>
-              <Feather name="book" size={40} color="#2E7D32" />
-            </View>
-
-            <View style={styles.bookInfo}>
-              <Text style={styles.bookTitle}>{book.title}</Text>
-
-              <Text style={styles.bookText}>{book.author}</Text>
-
-              <Text style={styles.bookText}>ISBN: {book.isbn}</Text>
-
-              <Text style={styles.bookText}>
-                {book.status === "DOACAO" ? "Para doação" : "Para troca"}
-              </Text>
-            </View>
-          </View>
+          <BookCard
+            key={book.id}
+            book={book}
+            onPress={() => router.push(`/book/${book.id}`)}
+          />
         ))}
       </ScrollView>
 
@@ -335,50 +318,5 @@ const styles = StyleSheet.create({
     color: "#2E7D32",
 
     marginBottom: 20,
-  },
-
-  bookCard: {
-    flexDirection: "row",
-
-    backgroundColor: "#FFF",
-
-    borderRadius: 24,
-
-    padding: 16,
-
-    marginBottom: 16,
-
-    elevation: 3,
-  },
-
-  bookImage: {
-    width: 100,
-    height: 130,
-
-    borderRadius: 20,
-
-    backgroundColor: "#E8F5E9",
-
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  bookInfo: {
-    flex: 1,
-    marginLeft: 16,
-    justifyContent: "center",
-  },
-
-  bookTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#2E7D32",
-    marginBottom: 8,
-  },
-
-  bookText: {
-    fontSize: 15,
-    color: "#555",
-    marginBottom: 4,
   },
 });

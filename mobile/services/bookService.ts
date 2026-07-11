@@ -1,9 +1,10 @@
 import api from "./api";
 import { ImagePickerAsset } from "expo-image-picker";
 import { Book } from "../models/Book";
+import { CreateBookRequest } from "../models/CreateBookRequest";
 
 export async function registerBook(
-  book: Book
+  book: CreateBookRequest
 ) {
   const response = await api.post(
     "/api/books",
