@@ -1,16 +1,42 @@
 import api from "./api";
+import{
+  BookRequestResponseDTO,
+  BookRequestUpdateDTO,
+  PageResponse,
+} from "../models/BookRequest";
 
-import { BookRequest }
-from "../models/BookRequest";
+class  bookRequestService {
+  async findByProponent(
+    proponentId: number
+  ):
+Promise<PageResponse<BookRequestResponseDTO>> {
+  const response=await
+api.get<PageResponse<BookRequestResponseDTO>>(
+  "/api/bok-requests",
+    params: {
+      proponentId,
+    },
+  }
+ );
+}
+return response.data;  
+}
 
-export async function createBookRequest(
-  data: BookRequest
-) {
+async updateStatus(
+  id: number,
+  status: "ACEITA" | "RECUSADA"
+): Promise<BookRequestResponseDTO> {
+  const dto: BookRequestUpdateDTO={
+    status,
+  }:
 
-  const response = await api.post(
-    "/api/book-requests",
-    data
+  const response=awaitapi.put<BookRequestResponseDTO>(
+    `/api/book-requests/${id}`,
+    dto
   );
 
   return response.data;
+ }
 }
+
+export default new bookRequestService

@@ -1,415 +1,224 @@
-import { Feather } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
-import { ScrollView } from "react-native";
-import { BottomNavigation } from "../components/BottomNavigation";
-
+import React from "react";
 import {
-  Image,
+  ActivityIndicator,
+  FlatList,
+  SafeAreaView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { Feather } from "@expo/vector-icons";
+import { router } from "expo-router";
 
-import { useBookRegisterViewModel } from "../viewmodels/useBookRegisterViewModel";
+import { useBookRequestsViewModel } from "../viewmodels/useBookRequestsViewModel";
 
-export default function BookRegister() {
-  const vm = useBookRegisterViewModel();
+export default function BookRequestsScreen() {
+  const vm = useBookRequestsViewModel();
+
+  const renderStatusColor = (status: string) => {
+    switch (status) {
+      case "ACEITA":
+        return "#2E7D32";
+      case "RECUSADA":
+        return "#D32F2F";
+      default:
+        return "#F9A825";
+    }
+  };
+
+  if (vm.loading) {
+    return (
+      <SafeAreaView style={{ flex: 1 }}>
+        <LinearGradient
+          colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
+          style={styles.container}
+        >
+          <ActivityIndicator size="large" color="#2E7D32" />
+        </LinearGradient>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <LinearGradient
-      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-      style={styles.gradient}
-    >
-      <ScrollView contentContainerStyle={[styles.container, { flexGrow: 1 }]}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <LinearGradient
+        colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
+        style={styles.container}
+      >
         <View style={styles.header}>
-          <Text style={styles.title}>Cadastrar Livro</Text>
-        </View>
-
-        <View style={styles.formContainer}>
-          <View style={styles.typeContainer}>
-            <TouchableOpacity
-              style={[
-                styles.typeButton,
-
-                vm.status === "DOACAO" && styles.activeTypeButton,
-              ]}
-              onPress={() => vm.setStatus("DOACAO")}
-            >
-              <Text
-                style={[
-                  styles.typeButtonText,
-
-                  vm.status === "DOACAO" && styles.activeTypeButtonText,
-                ]}
-              >
-                Doação
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.typeButton,
-
-                vm.status === "TROCA" && styles.activeTypeButton,
-              ]}
-              onPress={() => vm.setStatus("TROCA")}
-            >
-              <Text
-                style={[
-                  styles.typeButtonText,
-
-                  vm.status === "TROCA" && styles.activeTypeButtonText,
-                ]}
-              >
-                Troca
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Feather
-              name="book"
-              size={20}
-              color="#81C784"
-              style={styles.icon}
-            />
-
-            <TextInput
-              placeholder="Titulo"
-              placeholderTextColor="#A5D6A7"
-              value={vm.title}
-              onChangeText={vm.setTitle}
-              style={styles.input}
-              editable={!vm.loading}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Feather
-              name="edit"
-              size={20}
-              color="#81C784"
-              style={styles.icon}
-            />
-
-            <TextInput
-              placeholder="Autor"
-              placeholderTextColor="#A5D6A7"
-              value={vm.author}
-              onChangeText={vm.setAuthor}
-              style={styles.input}
-              editable={!vm.loading}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Feather
-              name="hash"
-              size={20}
-              color="#81C784"
-              style={styles.icon}
-            />
-
-            <TextInput
-              placeholder="ISBN"
-              placeholderTextColor="#A5D6A7"
-              value={vm.isbn}
-              onChangeText={vm.setIsbn}
-              style={styles.input}
-              editable={!vm.loading}
-            />
-          </View>
-
-          <View style={[styles.inputContainer, styles.descriptionContainer]}>
-            <TextInput
-              placeholder="Descrição"
-              placeholderTextColor="#A5D6A7"
-              value={vm.description}
-              onChangeText={vm.setDescription}
-              multiline
-              style={styles.descriptionInput}
-              editable={!vm.loading}
-            />
-          </View>
-
-          <Text style={styles.photosTitle}>Adicionar fotos do livro</Text>
-
-          <View style={styles.photoButtonsContainer}>
-            <TouchableOpacity style={styles.photoButton} onPress={vm.takePhoto}>
-              <Feather name="camera" size={22} color="#2E7D32" />
-
-              <Text style={styles.photoButtonText}>Câmera</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.photoButton}
-              onPress={vm.pickImages}
-            >
-              <Feather name="image" size={22} color="#2E7D32" />
-
-              <Text style={styles.photoButtonText}>Galeria</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.photosContainer}>
-            {vm.photos.map((photo, index) => (
-              <View key={index} style={styles.photoWrapper}>
-                <Image
-                  source={{ uri: photo.uri }}
-                  style={styles.photoPreview}
-                />
-
-                <TouchableOpacity
-                  style={styles.removePhotoButton}
-                  onPress={() => vm.removePhoto(index)}
-                >
-                  <Feather name="x" size={16} color="#FFF" />
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-
-          <TouchableOpacity
-            onPress={vm.handleRegisterBook}
-            disabled={vm.loading}
-            style={[styles.button, vm.loading && styles.buttonDisabled]}
-          >
-            <LinearGradient
-              colors={vm.loading ? ["#999", "#999"] : ["#66BB6A", "#26A69A"]}
-              start={{
-                x: 0,
-                y: 0,
-              }}
-              end={{
-                x: 1,
-                y: 0,
-              }}
-              style={styles.buttonGradient}
-            >
-              <Text style={styles.buttonText}>
-                {vm.loading ? "CADASTRANDO..." : "CADASTRAR"}
-              </Text>
-            </LinearGradient>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Feather name="arrow-left" size={24} color="#2E7D32" />
           </TouchableOpacity>
-        </View>
-      </ScrollView>
 
-      <BottomNavigation />
-    </LinearGradient>
+          <Text style={styles.title}>Solicitações</Text>
+
+          <View style={{ width: 24 }} />
+        </View>
+
+        <FlatList
+          data={vm.requests}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={{ paddingBottom: 30 }}
+          ListEmptyComponent={
+            <Text style={styles.empty}>
+              Nenhuma solicitação encontrada.
+            </Text>
+          }
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <View style={styles.row}>
+                <Feather name="book-open" size={22} color="#2E7D32" />
+
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <Text style={styles.book}>
+                    {item.bookTitle}
+                  </Text>
+
+                  <Text style={styles.user}>
+                    Solicitado por: {item.requesterName}
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.status,
+                      { color: renderStatusColor(item.status) },
+                    ]}
+                  >
+                    {item.status}
+                  </Text>
+                </View>
+              </View>
+
+              {item.status === "PENDENTE" && (
+                <View style={styles.buttons}>
+                  <TouchableOpacity
+                    onPress={() => vm.handleReject(item.id)}
+                    style={styles.rejectButton}
+                  >
+                    <Feather
+                      name="x-circle"
+                      size={18}
+                      color="#FFF"
+                    />
+
+                    <Text style={styles.buttonText}>
+                      Recusar
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => vm.handleAccept(item.id)}
+                  >
+                    <LinearGradient
+                      colors={["#2E7D32", "#43A047"]}
+                      style={styles.acceptButton}
+                    >
+                      <Feather
+                        name="check-circle"
+                        size={18}
+                        color="#FFF"
+                      />
+
+                      <Text style={styles.buttonText}>
+                        Aceitar
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          )}
+        />
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
-
   container: {
-    padding: 24,
-    paddingVertical: 40,
-    paddingBottom: 120,
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
 
   header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 25,
   },
 
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#2E7D32",
   },
 
-  formContainer: {
-    backgroundColor: "rgba(255,255,255,0.9)",
-
-    borderRadius: 24,
-
-    padding: 24,
-
-    shadowColor: "#000",
-
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-
-    zIndex: 10,
-    elevation: 10,
-  },
-
-  typeContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-    gap: 12,
-  },
-
-  typeButton: {
-    flex: 1,
-
-    borderWidth: 2,
-    borderColor: "#C8E6C9",
-
-    borderRadius: 16,
-
-    paddingVertical: 14,
-
-    alignItems: "center",
-
+  card: {
     backgroundColor: "#FFF",
+    borderRadius: 24,
+    elevation: 3,
+    padding: 18,
+    marginBottom: 18,
   },
 
-  activeTypeButton: {
-    backgroundColor: "#66BB6A",
-    borderColor: "#66BB6A",
-  },
-
-  typeButtonText: {
-    color: "#66BB6A",
-    fontWeight: "600",
-  },
-
-  activeTypeButtonText: {
-    color: "#FFF",
-  },
-
-  inputContainer: {
+  row: {
     flexDirection: "row",
-
     alignItems: "center",
-
-    backgroundColor: "#FFFFFF",
-
-    borderWidth: 2,
-    borderColor: "#C8E6C9",
-
-    borderRadius: 16,
-
-    marginBottom: 16,
-
-    paddingHorizontal: 16,
-
-    height: 56,
   },
 
-  descriptionContainer: {
-    height: 120,
-    alignItems: "flex-start",
-    paddingTop: 16,
+  book: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
   },
 
-  icon: {
-    marginRight: 12,
+  user: {
+    marginTop: 4,
+    color: "#666",
+    fontSize: 15,
   },
 
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: "#2E7D32",
-  },
-
-  descriptionInput: {
-    flex: 1,
-    width: "100%",
-    fontSize: 16,
-    color: "#2E7D32",
-    textAlignVertical: "top",
-  },
-
-  button: {
-    borderRadius: 16,
-    overflow: "hidden",
+  status: {
     marginTop: 8,
+    fontWeight: "bold",
   },
 
-  buttonDisabled: {
-    opacity: 0.6,
+  buttons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
   },
 
-  buttonGradient: {
-    paddingVertical: 18,
+  acceptButton: {
+    flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 16,
+  },
+
+  rejectButton: {
+    backgroundColor: "#D32F2F",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 16,
   },
 
   buttonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 1,
-  },
-
-  photosTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#2E7D32",
-    marginBottom: 10,
-  },
-
-  photoButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-
-    borderWidth: 2,
-    borderColor: "#C8E6C9",
-
-    borderRadius: 16,
-
-    paddingVertical: 14,
-
-    marginBottom: 16,
-
-    flex: 1,
-  },
-
-  photoButtonText: {
+    color: "#FFF",
+    fontWeight: "bold",
     marginLeft: 8,
-    color: "#2E7D32",
-    fontWeight: "600",
   },
 
-  photosContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-    marginBottom: 20,
-  },
-
-  photoPreview: {
-    width: 90,
-    height: 90,
-    borderRadius: 12,
-  },
-
-  photoWrapper: {
-    position: "relative",
-  },
-
-  removePhotoButton: {
-    position: "absolute",
-    top: 4,
-    right: 4,
-
-    width: 24,
-    height: 24,
-
-    borderRadius: 12,
-
-    backgroundColor: "rgba(0,0,0,0.7)",
-
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  photoButtonsContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 16,
+  empty: {
+    textAlign: "center",
+    marginTop: 50,
+    color: "#666",
+    fontSize: 16,
   },
 });
