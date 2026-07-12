@@ -7,6 +7,7 @@ import com.bookloop.api.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,28 +33,31 @@ public class MatchService {
             return;
         }
 
-        BookRequest requestA = acceptedRequest;
-        BookRequest requestB = reverseRequest.get();
-
-        Long userAId = Math.min(requesterId, ownerId);
-        Long userBId = Math.max(requesterId, ownerId);
-
-        if (matchRepository.existsByUserAIdAndUserBId(
-                userAId,
-                userBId
-        )) {
-            return;
-        }
-
+        BookRequest requestFromUserA;
+        BookRequest requestFromUserB;
         User userA;
         User userB;
 
         if (requesterId < ownerId) {
             userA = acceptedRequest.getRequester();
             userB = acceptedRequest.getBook().getUser();
+
+            requestFromUserA = acceptedRequest;
+            requestFromUserB = reverseRequest.get();
+
         } else {
             userA = acceptedRequest.getBook().getUser();
             userB = acceptedRequest.getRequester();
+
+            requestFromUserA = reverseRequest.get();
+            requestFromUserB = acceptedRequest;
+        }
+
+        Long userAId = Math.min(requesterId, ownerId);
+        Long userBId = Math.max(requesterId, ownerId);
+
+        if (matchRepository.existsByUserAIdAndUserBId(userAId, userBId)) {
+            return;
         }
 
         Match match = new Match();
@@ -61,9 +65,49 @@ public class MatchService {
         match.setUserA(userA);
         match.setUserB(userB);
 
-        match.setRequestFromUserA(requestA);
-        match.setRequestFromUserB(requestB);
+        match.setRequestFromUserA(requestFromUserA);
+        match.setRequestFromUserB(requestFromUserB);
 
         matchRepository.save(match);
+    }
+
+    public List<MatchResponseDTO> findMatchesByUser(Long userId) {
+
+        List<Match> matches = matchRepository.findMatchesByUser(userId);
+
+        return matches.stream()
+                .map(match -> toResponse(match, userId))
+                .toList();
+    }
+
+    private MatchResponseDTO toResponse(Match match, Long userId) {
+
+        MatchResponseDTO dto = new MatchResponseDTO();
+        dto.setMatchId(match.getId());
+
+        if (match.getUserA().getId().equals(userId)) {
+
+            dto.setOtherUserId(match.getUserB().getId());
+            dto.setOtherUserName(match.getUserB().getName());
+
+            dto.setMyBookId(match.getRequestFromUserA().getBook().getId());
+            dto.setMyBookTitle(match.getRequestFromUserA().getBook().getTitle());
+
+            dto.setOtherBookId(match.getRequestFromUserB().getBook().getId());
+            dto.setOtherBookTitle(match.getRequestFromUserB().getBook().getTitle());
+
+        } else {
+
+            dto.setOtherUserId(match.getUserA().getId());
+            dto.setOtherUserName(match.getUserA().getName());
+
+            dto.setMyBookId(match.getRequestFromUserB().getBook().getId());
+            dto.setMyBookTitle(match.getRequestFromUserB().getBook().getTitle());
+
+            dto.setOtherBookId(match.getRequestFromUserA().getBook().getId());
+            dto.setOtherBookTitle(match.getRequestFromUserA().getBook().getTitle());
+        }
+
+        return dto;
     }
 }

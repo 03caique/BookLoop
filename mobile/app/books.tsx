@@ -1,50 +1,32 @@
+import { LinearGradient } from "expo-linear-gradient";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
+  ActivityIndicator,
   FlatList,
   StyleSheet,
-  ActivityIndicator,
+  Text,
+  TextInput,
+  TouchableOpacity
 } from "react-native";
-
+import { BookCard } from "../components/BookCard";
 import { BottomNavigation } from "../components/BottomNavigation";
-
-import { LinearGradient }
-from "expo-linear-gradient";
-
-import { useBooksViewModel }
-from "../viewmodels/useBooksViewModel";
-
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useBooksViewModel } from "../viewmodels/useBooksViewModel";
 
 export default function Books() {
   const router = useRouter();
-  
+
   const { query } = useLocalSearchParams();
 
-  const {
-    books,
-    search,
-    setSearch,
-    loading,
-    loadBooks,
-  } = useBooksViewModel((query as string) || "");
+  const { books, search, setSearch, loading, loadBooks } = useBooksViewModel(
+    (query as string) || "",
+  );
 
   return (
-
     <LinearGradient
-      colors={[
-        "#E8F5E9",
-        "#F1F8E9",
-        "#FFFFFF",
-      ]}
+      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
       style={styles.container}
     >
-
-      <Text style={styles.title}>
-        Livros
-      </Text>
+      <Text style={styles.title}>Livros</Text>
 
       <TextInput
         placeholder="Buscar livro ou autor"
@@ -53,60 +35,24 @@ export default function Books() {
         style={styles.input}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={loadBooks}
-      >
-
-        <Text style={styles.buttonText}>
-          BUSCAR
-        </Text>
-
+      <TouchableOpacity style={styles.button} onPress={loadBooks}>
+        <Text style={styles.buttonText}>BUSCAR</Text>
       </TouchableOpacity>
 
       {loading ? (
-
         <ActivityIndicator size="large" />
-
       ) : (
-
         <FlatList
           data={books}
-          keyExtractor={(item) =>
-            item.id!.toString()
-          }
+          keyExtractor={(item) => item.id!.toString()}
           contentContainerStyle={{
             paddingBottom: 120,
           }}
           renderItem={({ item }) => (
-
-            <TouchableOpacity style={styles.card} onPress={() => router.push(`/book/${item.id}`)}>
-
-              <Text style={styles.bookTitle}>
-                {item.title}
-              </Text>
-
-              <Text>
-                Autor: {item.author}
-              </Text>
-
-              <Text>
-                ISBN: {item.isbn}
-              </Text>
-
-              <Text>
-                Para: {
-                  item.status === "DOACAO"
-                    ? "Doação"
-                    : "Troca"
-                }
-              </Text>
-
-              <Text>
-                Dono: {item.userName}
-              </Text>
-
-            </TouchableOpacity>
+            <BookCard
+              book={item}
+              onPress={() => router.push(`/book/${item.id}`)}
+            />
           )}
         />
       )}
@@ -117,7 +63,6 @@ export default function Books() {
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     padding: 20,
@@ -150,20 +95,5 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFF",
     fontWeight: "bold",
-  },
-
-  card: {
-    backgroundColor: "#FFF",
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 14,
-    elevation: 3,
-  },
-
-  bookTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-    color: "#2E7D32",
   },
 });
