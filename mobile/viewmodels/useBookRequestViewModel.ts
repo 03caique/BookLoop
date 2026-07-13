@@ -1,20 +1,27 @@
-import {useEffect, useState} from "react";
-import {Alert} from "react-native";
+import { useEffect, useState } from "react";
+import { Alert } from "react-native";
 import bookRequestService from "../services/bookRequestService";
-import {BookRequestResponseDTO} from "../models/BookRequest";
+import { BookRequestResponseDTO } from "../models/BookRequest";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export function useBookRequestsViewModel(){
+export function useBookRequestViewModel() {
   const [requests, setRequests] = useState<BookRequestResponseDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const proponentId = 1;
 
   const loadRequests = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await bookRequestService.findByProponent(proponentId);
+      const userId = await AsyncStorage.getItem("userId");
+
+      if (!userId) {
+        setError("Usuário não autenticado.");
+        return;
+      }
+
+      const response = await bookRequestService.findByProponent(Number(userId));
 
       setRequests(response.content);
     } catch (err) {
@@ -36,13 +43,7 @@ export function useBookRequestsViewModel(){
 
       await bookRequestService.updateStatus(id, "ACEITA");
 
-      setRequests((prev) =>
-        prev.map((request) =>
-          request.id === id
-            ? { ...request, status: "ACEITA" }
-            : request
-        )
-      );
+      await loadRequests();
 
       Alert.alert("Sucesso", "Solicitação aceita com sucesso.");
     } catch (err) {
@@ -59,13 +60,7 @@ export function useBookRequestsViewModel(){
 
       await bookRequestService.updateStatus(id, "RECUSADA");
 
-      setRequests((prev) =>
-        prev.map((request) =>
-          request.id === id
-            ? { ...request, status: "RECUSADA" }
-            : request
-        )
-      );
+      await loadRequests();
 
       Alert.alert("Sucesso", "Solicitação recusada com sucesso.");
     } catch (err) {

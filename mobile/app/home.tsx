@@ -43,7 +43,7 @@ export default function Home() {
           <Text style={styles.logo}>BookLoop</Text>
 
           <View style={styles.headerIcons}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/book-requests")}>
               <Feather name="bell" size={24} color="#2E7D32" />
             </TouchableOpacity>
 
