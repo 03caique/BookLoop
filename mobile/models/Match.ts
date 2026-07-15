@@ -1,6 +1,12 @@
 export interface MatchResponseDTO{
-    id: number;
-    livroOferecido: string;
-    livroDesejado: string;
-    nomeOutroUsuario: string;
+  matchId: number;
+
+  otherUserId: number;
+  otherUserName: string;
+
+  myBookId: number;
+  myBookTitle: string;
+
+  otherBookId: number;
+  otherBookTitle: string;
 }

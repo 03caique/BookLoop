@@ -1,39 +1,48 @@
 import { useCallback, useEffect, useState } from "react";
-import { alert } from "react-native";
+import { Alert } from "react-native";
 import { MatchResponseDTO } from "../models/Match";
-import { matchService } from "../service/matchService";
+import { matchService } from "../services/matchService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function useMatchesViewModel() {
-    const [matches. setMatches]=useState<MatchResponseDTO[]>([]);
-    const [loading, setLoading]=const[loading, setLoading]=useState(false);
-    const[error, setError]=useState<string | null>(null);
-    const usuarioId=1;
-    const loadMatches=useCallback(async()=>{
-        try {
-            setLoading(true);
-            setError(null);
-            const data=await matchService.findMatchesByUser(usuarioId);
-            setMatches(data);
-        }catch(err){
-            setError("Não foi possivel carregar os matches.");
-            Alert.alert("Erro","Não foi possivel carregar os matches.");
-        }finally {
-            setLoading(false);
-        }
-    }, [usuarioId]);
+  const [matches, setMatches] = useState<MatchResponseDTO[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-    useEffect(()=> {
-        loadMatches();
-    }, [loadMatches]);
+  const loadMatches = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    const refresh=async()=> {
-        await loadMatches();
-    };
+      const userId = await AsyncStorage.getItem("userId");
 
-    return {
-        matches,
-        loading,
-        error,
-        refresh,
-    };
+      if (!userId) {
+        setError("Usuário não autenticado.");
+        return;
+      }
+
+      const data = await matchService.findMatchesByUser(Number(userId));
+
+      setMatches(data);
+    } catch (err) {
+      console.error(err);
+      setError("Não foi possível carregar os matches.");
+      Alert.alert("Erro", "Não foi possível carregar os matches.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadMatches();
+  }, [loadMatches]);
+
+  const refresh = loadMatches;
+
+  return {
+    matches,
+    loading,
+    error,
+    refresh,
+  };
 }

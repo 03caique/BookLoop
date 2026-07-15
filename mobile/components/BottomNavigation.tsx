@@ -51,6 +51,20 @@ export function BottomNavigation() {
         />
       </TouchableOpacity>
 
+      <TouchableOpacity
+        onPress={() => router.replace("/matches")}
+      >
+        <Feather
+          name="repeat"
+          size={26}
+          color={
+            pathname === "/matches"
+              ? "#2E7D32"
+              : "#9E9E9E"
+          }
+        />
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -60,8 +74,8 @@ const styles = StyleSheet.create({
   bottomNav: {
     position: "absolute",
 
-    left: 16,
-    right: 16,
+    left: 12,
+    right: 12,
     bottom: 40,
 
     height: 65,
