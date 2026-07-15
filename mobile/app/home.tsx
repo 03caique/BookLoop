@@ -1,4 +1,7 @@
 import { Feather } from "@expo/vector-icons";
+import * as NavigationBar from "expo-navigation-bar";
+import { router } from "expo-router";
+import { useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,12 +11,9 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useEffect } from "react";
-import * as NavigationBar from "expo-navigation-bar";
-import { BottomNavigation } from "../components/BottomNavigation";
-import { router } from "expo-router";
-import { useBooksViewModel } from "../viewmodels/useBooksViewModel";
 import { BookCard } from "../components/BookCard";
+import { BottomNavigation } from "../components/BottomNavigation";
+import { useBooksViewModel } from "../viewmodels/useBooksViewModel";
 
 export default function Home() {
   const insets = useSafeAreaInsets();
@@ -85,6 +85,7 @@ export default function Home() {
         >
           <Text style={styles.viewAllText}>Ver Todos</Text>
         </TouchableOpacity>
+
       </ScrollView>
 
       <BottomNavigation />

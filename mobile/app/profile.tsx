@@ -169,6 +169,15 @@ export default function Profile() {
             key={book.id}
             book={book}
             onPress={() => router.push(`/book/${book.id}`)}
+            showEditButton
+            onEdit={() =>
+              router.push({
+                pathname: "/book-register",
+                params: {
+                  id: String(book.id),
+                },
+              })
+            }
           />
         ))}
       </ScrollView>

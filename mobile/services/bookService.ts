@@ -73,3 +73,25 @@ export async function getBooksByUser(
 
   return response.data;
 }
+
+export async function updateBook(
+  id: number,
+  book: CreateBookRequest
+) {
+  const response = await api.put(
+    `/api/books/${id}`,
+    book
+  );
+
+  return response.data;
+}
+
+export async function findBookByIsbn(
+  isbn: string
+) {
+  const response = await api.get(
+    `/api/isbn/${isbn}`
+  );
+
+  return response.data;
+}

@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { ScrollView } from "react-native";
 import { BottomNavigation } from "../components/BottomNavigation";
 
@@ -24,7 +25,22 @@ export default function BookRegister() {
     >
       <ScrollView contentContainerStyle={[styles.container, { flexGrow: 1 }]}>
         <View style={styles.header}>
-          <Text style={styles.title}>Cadastrar Livro</Text>
+          {vm.isEditing ? (
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+            >
+              <Feather name="arrow-left" size={26} color="#2E7D32" />
+            </TouchableOpacity>
+          ) : (
+            <View style={{ width: 26 }} />
+          )}
+
+          <Text style={styles.title}>
+            {vm.isEditing ? "Editar Livro" : "Cadastrar Livro"}
+          </Text>
+
+          <View style={{ width: 26 }} />
         </View>
 
         <View style={styles.formContainer}>
@@ -117,6 +133,7 @@ export default function BookRegister() {
               placeholderTextColor="#A5D6A7"
               value={vm.isbn}
               onChangeText={vm.setIsbn}
+              onBlur={vm.handleIsbnSearch}
               style={styles.input}
               editable={!vm.loading}
             />
@@ -172,7 +189,7 @@ export default function BookRegister() {
           </View>
 
           <TouchableOpacity
-            onPress={vm.handleRegisterBook}
+            onPress={vm.isEditing ? vm.handleUpdateBook : vm.handleRegisterBook}
             disabled={vm.loading}
             style={[styles.button, vm.loading && styles.buttonDisabled]}
           >
@@ -189,14 +206,20 @@ export default function BookRegister() {
               style={styles.buttonGradient}
             >
               <Text style={styles.buttonText}>
-                {vm.loading ? "CADASTRANDO..." : "CADASTRAR"}
+                {vm.loading
+                  ? vm.isEditing
+                    ? "SALVANDO..."
+                    : "CADASTRANDO..."
+                  : vm.isEditing
+                    ? "SALVAR ALTERAÇÕES"
+                    : "CADASTRAR"}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
       </ScrollView>
 
-      <BottomNavigation />
+      {!vm.isEditing && <BottomNavigation />}
     </LinearGradient>
   );
 }
@@ -213,7 +236,9 @@ const styles = StyleSheet.create({
   },
 
   header: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 40,
   },
 
@@ -411,5 +436,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     marginBottom: 16,
+  },
+
+  backButton: {
+    width: 36,
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
