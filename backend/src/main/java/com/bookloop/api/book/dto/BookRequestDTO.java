@@ -25,7 +25,6 @@ public class BookRequestDTO {
     @NotNull
     private BookStatus status;
 
-    @NotEmpty(message = "O livro deve possuir pelo menos 3 fotos.")
     private List<String> photos;
 
 }

@@ -133,7 +133,7 @@ export default function BookDetails() {
               ]}
             >
               <Text style={styles.badgeText}>
-                {book.status === "DOACAO" ? "Doação" : "Troca"}
+                {book.status === "DOACAO" ? "Para Doação" : "Para Troca"}
               </Text>
             </View>
           </View>
