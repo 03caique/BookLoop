@@ -1,15 +1,15 @@
 import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import {
+  findBookByIsbn,
   getBookById,
   registerBook,
   updateBook,
   uploadBookPhoto,
 } from "../services/bookService";
-import { router } from "expo-router";
 
 export function useBookRegisterViewModel() {
   const [title, setTitle] = useState("");
@@ -49,6 +49,30 @@ export function useBookRegisterViewModel() {
 
     loadBook();
   }, [id]);
+
+  async function handleIsbnSearch() {
+    if (!isbn.trim() || isbn.length < 10) {
+      return;
+    }
+
+    try {
+      const response = await findBookByIsbn(isbn);
+
+      if (response.found) {
+        setTitle(response.title ?? "");
+        setAuthor(response.author ?? "");
+
+        return;
+      }
+
+      Alert.alert(
+        "ISBN não encontrado",
+        "Preencha o título e o autor manualmente.",
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   async function handleRegisterBook() {
     if (
@@ -225,6 +249,8 @@ export function useBookRegisterViewModel() {
     takePhoto,
 
     isEditing,
+
+    handleIsbnSearch,
 
     handleRegisterBook,
     handleUpdateBook,

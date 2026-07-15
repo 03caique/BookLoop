@@ -133,6 +133,7 @@ export default function BookRegister() {
               placeholderTextColor="#A5D6A7"
               value={vm.isbn}
               onChangeText={vm.setIsbn}
+              onBlur={vm.handleIsbnSearch}
               style={styles.input}
               editable={!vm.loading}
             />

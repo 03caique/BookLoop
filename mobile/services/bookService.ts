@@ -85,3 +85,13 @@ export async function updateBook(
 
   return response.data;
 }
+
+export async function findBookByIsbn(
+  isbn: string
+) {
+  const response = await api.get(
+    `/api/isbn/${isbn}`
+  );
+
+  return response.data;
+}
