@@ -1,8 +1,15 @@
-import { useState } from "react";
-import { Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { ImagePickerAsset } from "expo-image-picker";
-import { registerBook, uploadBookPhoto } from "../services/bookService";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { Alert } from "react-native";
+import {
+  getBookById,
+  registerBook,
+  updateBook,
+  uploadBookPhoto,
+} from "../services/bookService";
+import { router } from "expo-router";
 
 export function useBookRegisterViewModel() {
   const [title, setTitle] = useState("");
@@ -12,6 +19,36 @@ export function useBookRegisterViewModel() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"DOACAO" | "TROCA">("DOACAO");
   const [photos, setPhotos] = useState<ImagePickerAsset[]>([]);
+  const { id } = useLocalSearchParams();
+  const isEditing = !!id;
+  const [existingPhotos, setExistingPhotos] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!isEditing) return;
+
+    async function loadBook() {
+      try {
+        setLoading(true);
+
+        const book = await getBookById(Number(id));
+
+        setTitle(book.title);
+        setAuthor(book.author);
+        setIsbn(book.isbn);
+        setDescription(book.description);
+        setStatus(book.status);
+        setExistingPhotos(book.photos.map((photo: any) => photo.imageUrl));
+      } catch (error) {
+        console.log(error);
+
+        Alert.alert("Erro", "Não foi possível carregar o livro.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadBook();
+  }, [id]);
 
   async function handleRegisterBook() {
     if (
@@ -69,6 +106,53 @@ export function useBookRegisterViewModel() {
     }
   }
 
+  async function handleUpdateBook() {
+    if (
+      !title.trim() ||
+      !author.trim() ||
+      !isbn.trim() ||
+      !description.trim()
+    ) {
+      Alert.alert("Erro", "Preencha todos os campos");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const newPhotoUrls: string[] = [];
+
+      for (const photo of photos) {
+        const url = await uploadBookPhoto(photo);
+        newPhotoUrls.push(url);
+      }
+
+      await updateBook(Number(id), {
+        title,
+        author,
+        isbn,
+        description,
+        status,
+        photos: [...existingPhotos, ...newPhotoUrls],
+      });
+
+      Alert.alert("Sucesso", "Livro atualizado com sucesso!", [
+        {
+          text: "OK",
+          onPress: () => router.replace("/profile"),
+        },
+      ]);
+    } catch (error: any) {
+      console.log(error.response?.data);
+
+      Alert.alert(
+        "Erro",
+        error.response?.data?.message ?? "Não foi possível atualizar o livro.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
   async function pickImages() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -93,28 +177,25 @@ export function useBookRegisterViewModel() {
   }
 
   async function takePhoto() {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
 
-  const permission =
-    await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(
+        "Permissão necessária",
+        "É necessário permitir o acesso à câmera.",
+      );
+      return;
+    }
 
-  if (!permission.granted) {
-    Alert.alert(
-      "Permissão necessária",
-      "É necessário permitir o acesso à câmera."
-    );
-    return;
-  }
-
-  const result =
-    await ImagePicker.launchCameraAsync({
+    const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ["images"],
       quality: 0.8,
     });
 
-  if (!result.canceled) {
-    setPhotos(prev => [...prev, ...result.assets]);
+    if (!result.canceled) {
+      setPhotos((prev) => [...prev, ...result.assets]);
+    }
   }
-}
 
   function removePhoto(index: number) {
     setPhotos((prev) => prev.filter((_, i) => i !== index));
@@ -143,6 +224,9 @@ export function useBookRegisterViewModel() {
     removePhoto,
     takePhoto,
 
+    isEditing,
+
     handleRegisterBook,
+    handleUpdateBook,
   };
 }
