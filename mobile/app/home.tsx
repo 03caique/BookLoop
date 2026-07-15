@@ -86,20 +86,6 @@ export default function Home() {
           <Text style={styles.viewAllText}>Ver Todos</Text>
         </TouchableOpacity>
 
-        {/* TODO: remover quando a tela de Matches estiver pronta */}
-        <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/chat",
-              params: {
-                receiverId: "12",
-                receiverName: "Ronaldo",
-              },
-            })
-          }
-        >
-          <Text>Testar Chat</Text>
-        </TouchableOpacity>
       </ScrollView>
 
       <BottomNavigation />
