@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BookCard } from "../components/BookCard";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { useBooksViewModel } from "../viewmodels/useBooksViewModel";
+import { useNotificationViewModel } from "../viewmodels/useNotificationViewModel";
 
 export default function Home() {
   const insets = useSafeAreaInsets();
@@ -24,6 +25,15 @@ export default function Home() {
   }, []);
 
   const vm = useBooksViewModel();
+  const notificationVm = useNotificationViewModel();
+
+  useEffect(() => {
+    notificationVm.startPolling();
+
+    return () => {
+      notificationVm.stopPolling();
+    };
+  }, []);
 
   if (vm.loading) {
     return (
@@ -43,9 +53,19 @@ export default function Home() {
           <Text style={styles.logo}>BookLoop</Text>
 
           <View style={styles.headerIcons}>
-            <TouchableOpacity onPress={() => router.push("/book-requests")}>
-              <Feather name="bell" size={24} color="#2E7D32" />
-            </TouchableOpacity>
+            <View>
+              <TouchableOpacity onPress={() => router.push("/book-requests")}>
+                <Feather name="bell" size={24} color="#2E7D32" />
+              </TouchableOpacity>
+
+              {notificationVm.unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {notificationVm.unreadCount}
+                  </Text>
+                </View>
+              )}
+            </View>
 
             <TouchableOpacity onPress={() => router.push("/profile")}>
               <Feather name="user" size={24} color="#2E7D32" />
@@ -85,7 +105,6 @@ export default function Home() {
         >
           <Text style={styles.viewAllText}>Ver Todos</Text>
         </TouchableOpacity>
-
       </ScrollView>
 
       <BottomNavigation />
@@ -184,5 +203,24 @@ const styles = StyleSheet.create({
 
     borderTopWidth: 1,
     borderTopColor: "#E0E0E0",
+  },
+
+  badge: {
+    position: "absolute",
+    right: -8,
+    top: -8,
+    backgroundColor: "#D32F2F",
+    borderRadius: 12,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 5,
+  },
+
+  badgeText: {
+    color: "#FFF",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
