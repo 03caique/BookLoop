@@ -1,7 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,11 +11,17 @@ import {
   View,
 } from "react-native";
 import { BookRequestStatus } from "../models/BookRequest";
-
+import { useNotificationViewModel } from "../viewmodels/useNotificationViewModel";
 import { useBookRequestViewModel } from "../viewmodels/useBookRequestViewModel";
+import React, { useEffect } from "react";
 
 export default function BookRequestsScreen() {
   const vm = useBookRequestViewModel();
+  const notificationVm = useNotificationViewModel();
+
+  useEffect(() => {
+    notificationVm.markAllAsRead();
+  }, []);
 
   const renderStatusColor = (status: BookRequestStatus) => {
     switch (status) {
