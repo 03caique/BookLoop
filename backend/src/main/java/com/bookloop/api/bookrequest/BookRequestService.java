@@ -6,6 +6,7 @@ import com.bookloop.api.bookrequest.dto.BookRequestRequestDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestResponseDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestUpdateDTO;
 import com.bookloop.api.match.MatchService;
+import com.bookloop.api.notification.NotificationService;
 import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
@@ -31,6 +32,7 @@ public class BookRequestService {
     private final ModelMapper modelMapper;
     private final MatchService matchService;
     private final LoggedUserService loggedUserService;
+    private final NotificationService notificationService;
 
     public BookRequestResponseDTO create(BookRequestRequestDTO dto) {
 
@@ -53,6 +55,7 @@ public class BookRequestService {
         request.setStatus(BookRequestStatus.PENDENTE);
 
         BookRequest savedRequest = bookRequestRepository.save(request);
+        notificationService.createRequestNotification(savedRequest);
 
         BookRequestResponseDTO responseDTO = modelMapper.map(savedRequest, BookRequestResponseDTO.class);
         responseDTO.setBookId(book.getId());
