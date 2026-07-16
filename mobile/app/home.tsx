@@ -54,7 +54,7 @@ export default function Home() {
 
           <View style={styles.headerIcons}>
             <View>
-              <TouchableOpacity onPress={() => router.push("/book-requests")}>
+              <TouchableOpacity onPress={() => router.push("/notifications")}>
                 <Feather name="bell" size={24} color="#2E7D32" />
               </TouchableOpacity>
 

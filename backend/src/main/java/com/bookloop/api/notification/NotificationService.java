@@ -2,6 +2,7 @@ package com.bookloop.api.notification;
 
 import com.bookloop.api.book.dto.BookResponseDTO;
 import com.bookloop.api.bookrequest.BookRequest;
+import com.bookloop.api.match.Match;
 import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.user.User;
 import lombok.AllArgsConstructor;
@@ -78,6 +79,29 @@ public class NotificationService {
             notification.setRead(true);
             repository.save(notification);
         }
+    }
+
+    public void createMatchNotification(Match match){
+        User userA = match.getUserA();
+        User userB = match.getUserB();
+
+        Notification notificationForA = new Notification();
+        notificationForA.setUser(userA);
+        notificationForA.setTitle("Novo match!");
+        notificationForA.setMessage("Você deu match com " + userB.getName() +"!");
+        notificationForA.setRead(false);
+        notificationForA.setType(NotificationType.MATCH_CRIADO);
+        notificationForA.setCreatedAt(LocalDateTime.now());
+        repository.save(notificationForA);
+
+        Notification notificationForB = new Notification();
+        notificationForB.setUser(userB);
+        notificationForB.setTitle("Novo match!");
+        notificationForB.setMessage("Você deu match com " + userA.getName() +"!");
+        notificationForB.setRead(false);
+        notificationForB.setType(NotificationType.MATCH_CRIADO);
+        notificationForB.setCreatedAt(LocalDateTime.now());
+        repository.save(notificationForB);
     }
 }
 

@@ -73,7 +73,11 @@ export function useNotificationViewModel() {
           await loadUnreadCount();
         }
 
-        router.push("/book-requests");
+        if (notification.type === "SOLICITACAO_RECEBIDA") {
+          router.push("/book-requests");
+        } else if (notification.type === "MATCH_CRIADO") {
+          router.push("/matches");
+        }
       } catch (error) {
         Alert.alert("Erro", "Não foi possível abrir a notificação.");
       }

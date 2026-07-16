@@ -3,12 +3,12 @@ package com.bookloop.api.match;
 import com.bookloop.api.bookrequest.BookRequest;
 import com.bookloop.api.bookrequest.BookRequestRepository;
 import com.bookloop.api.bookrequest.BookRequestStatus;
+import com.bookloop.api.notification.NotificationService;
 import com.bookloop.api.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -16,20 +16,21 @@ public class MatchService {
 
     private final MatchRepository matchRepository;
     private final BookRequestRepository bookRequestRepository;
+    private final NotificationService notificationService;
 
     public void checkForMatch(BookRequest acceptedRequest) {
 
         Long requesterId = acceptedRequest.getRequester().getId();
         Long ownerId = acceptedRequest.getBook().getUser().getId();
 
-        Optional<BookRequest> reverseRequest =
+        List<BookRequest> reverseRequests =
                 bookRequestRepository.findByRequesterIdAndBookUserIdAndStatus(
                         ownerId,
                         requesterId,
                         BookRequestStatus.ACEITA
                 );
 
-        if (reverseRequest.isEmpty()) {
+        if (reverseRequests.isEmpty()) {
             return;
         }
 
@@ -38,18 +39,20 @@ public class MatchService {
         User userA;
         User userB;
 
+        BookRequest reverseRequest = reverseRequests.get(0);
+
         if (requesterId < ownerId) {
             userA = acceptedRequest.getRequester();
             userB = acceptedRequest.getBook().getUser();
 
             requestFromUserA = acceptedRequest;
-            requestFromUserB = reverseRequest.get();
+            requestFromUserB = reverseRequest;
 
         } else {
             userA = acceptedRequest.getBook().getUser();
             userB = acceptedRequest.getRequester();
 
-            requestFromUserA = reverseRequest.get();
+            requestFromUserA = reverseRequest;
             requestFromUserB = acceptedRequest;
         }
 
@@ -69,6 +72,7 @@ public class MatchService {
         match.setRequestFromUserB(requestFromUserB);
 
         matchRepository.save(match);
+        notificationService.createMatchNotification(match);
     }
 
     public List<MatchResponseDTO> findMatchesByUser(Long userId) {
