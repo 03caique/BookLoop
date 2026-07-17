@@ -32,4 +32,15 @@ public class BookRequestController {
     public BookRequestResponseDTO updateStatus(@PathVariable Long id, @Valid @RequestBody BookRequestUpdateDTO dto) {
         return bookRequestService.updateStatus(id, dto);
     }
+
+    @PutMapping("/{id}/cancel")
+    @ResponseStatus(HttpStatus.OK)
+    public void cancel(@PathVariable Long id){
+        bookRequestService.cancel(id);
+    }
+
+    @GetMapping("/my")
+    public Page<BookRequestResponseDTO> findByRequester(Pageable pageable){
+        return bookRequestService.findByRequester(pageable);
+    }
 }

@@ -15,12 +15,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
+import java.util.List;
+
 
 @Service
 @AllArgsConstructor
@@ -44,8 +43,19 @@ public class BookRequestService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não pode solicitar seu próprio livro");
         }
 
-        if (bookRequestRepository.existsByBookIdAndRequesterId(dto.getBookId(), dto.getRequesterId())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solicitação já enviada");
+        if (bookRequestRepository.existsByBookIdAndRequesterIdAndStatusIn(
+                dto.getBookId(),
+                dto.getRequesterId(),
+                List.of(
+                        BookRequestStatus.PENDENTE,
+                        BookRequestStatus.ACEITA,
+                        BookRequestStatus.RECUSADA
+                )
+        )) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Solicitação já enviada"
+            );
         }
 
         BookRequest request = new BookRequest();
@@ -93,6 +103,10 @@ public class BookRequestService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não possui permissão para alterar esta solicitação");
         }
 
+        if (updateDTO.getStatus() != BookRequestStatus.ACEITA && updateDTO.getStatus() != BookRequestStatus.RECUSADA){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não possui permissão para alterar a solicitação para esse status");
+        }
+
         bookRequest.setStatus(updateDTO.getStatus());
 
         BookRequest updatedRequest = bookRequestRepository.save(bookRequest);
@@ -110,4 +124,40 @@ public class BookRequestService {
 
         return responseDTO;
     }
+
+    public void cancel(Long bookRequestId){
+        User loggedUser = loggedUserService.getLoggedUser();
+
+        BookRequest bookRequest = bookRequestRepository.findById(bookRequestId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitação não encontrada"));
+
+        if (!loggedUser.getId().equals(bookRequest.getRequester().getId())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não possui permissão para cancelar esta solicitação");
+        }
+
+        if (bookRequest.getStatus() != BookRequestStatus.PENDENTE){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Somente solicitações pendentes podem ser canceladas");
+        }
+
+        bookRequest.setStatus(BookRequestStatus.CANCELADA);
+        bookRequestRepository.save(bookRequest);
+    }
+
+    public Page<BookRequestResponseDTO> findByRequester(Pageable pageable){
+        User loggedUser = loggedUserService.getLoggedUser();
+
+        Page<BookRequest> bookRequests = bookRequestRepository.findByRequesterId(loggedUser.getId(), pageable);
+
+        return bookRequests.map(bookRequest -> {
+            BookRequestResponseDTO dto = modelMapper.map(bookRequest, BookRequestResponseDTO.class);
+
+            dto.setBookId(bookRequest.getBook().getId());
+            dto.setBookTitle(bookRequest.getBook().getTitle());
+            dto.setRequesterId(bookRequest.getRequester().getId());
+            dto.setRequesterName(bookRequest.getRequester().getName());
+            return dto;
+        });
+
+    }
+
 }

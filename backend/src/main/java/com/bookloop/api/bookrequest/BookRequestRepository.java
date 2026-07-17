@@ -25,4 +25,15 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
             BookRequestStatus status
     );
 
+    Page<BookRequest> findByRequesterId(
+            Long requesterId,
+            Pageable pageable
+    );
+
+    boolean existsByBookIdAndRequesterIdAndStatusIn(
+            Long bookId,
+            Long requesterId,
+            List<BookRequestStatus> status
+    );
+
 }
