@@ -141,7 +141,10 @@ export default function Profile() {
               <Feather name="chevron-right" size={22} color="#999" />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => router.push("/my-requests")}
+            >
               <View style={styles.menuLeft}>
                 <Feather name="repeat" size={22} color="#2E7D32" />
 

@@ -3,7 +3,11 @@ export interface BookRequest {
   requesterId: number;
 }
 
-export type BookRequestStatus = "PENDENTE" | "ACEITA" | "RECUSADA";
+export type BookRequestStatus =
+  | "PENDENTE"
+  | "ACEITA"
+  | "RECUSADA"
+  | "CANCELADA";
 
 export interface BookRequestResponseDTO {
   id: number;
