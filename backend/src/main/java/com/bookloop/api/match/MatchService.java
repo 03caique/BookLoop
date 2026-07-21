@@ -4,6 +4,9 @@ import com.bookloop.api.bookrequest.BookRequest;
 import com.bookloop.api.bookrequest.BookRequestRepository;
 import com.bookloop.api.bookrequest.BookRequestStatus;
 import com.bookloop.api.notification.NotificationService;
+import com.bookloop.api.transaction.Transaction;
+import com.bookloop.api.transaction.TransactionRepository;
+import com.bookloop.api.transaction.TransactionStatus;
 import com.bookloop.api.user.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ public class MatchService {
     private final MatchRepository matchRepository;
     private final BookRequestRepository bookRequestRepository;
     private final NotificationService notificationService;
+    private final TransactionRepository transactionRepository;
 
     public void checkForMatch(BookRequest acceptedRequest) {
 
@@ -71,8 +75,28 @@ public class MatchService {
         match.setRequestFromUserA(requestFromUserA);
         match.setRequestFromUserB(requestFromUserB);
 
-        matchRepository.save(match);
-        notificationService.createMatchNotification(match);
+        match.setStatus(MatchStatus.ATIVO);
+
+        Match savedMatch = matchRepository.save(match);
+
+        Transaction transactionA = new Transaction();
+        transactionA.setMatch(savedMatch);
+        transactionA.setBook(requestFromUserA.getBook());
+        transactionA.setProponent(userA);
+        transactionA.setRequester(userB);
+        transactionA.setStatus(TransactionStatus.PENDENTE);
+
+        Transaction transactionB = new Transaction();
+        transactionB.setMatch(savedMatch);
+        transactionB.setBook(requestFromUserB.getBook());
+        transactionB.setProponent(userB);
+        transactionB.setRequester(userA);
+        transactionB.setStatus(TransactionStatus.PENDENTE);
+
+        transactionRepository.save(transactionA);
+        transactionRepository.save(transactionB);
+
+        notificationService.createMatchNotification(savedMatch);
     }
 
     public List<MatchResponseDTO> findMatchesByUser(Long userId) {

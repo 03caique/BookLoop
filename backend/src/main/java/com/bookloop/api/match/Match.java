@@ -3,6 +3,7 @@ package com.bookloop.api.match;
 import com.bookloop.api.bookrequest.BookRequest;
 import com.bookloop.api.user.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -31,4 +32,8 @@ public class Match {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private MatchStatus status;
 }
