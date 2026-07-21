@@ -11,6 +11,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/messages")
 @AllArgsConstructor
@@ -28,6 +31,12 @@ public class ChatController {
     @GetMapping("/{receiverId}")
     public Page<MessageResponseDTO> findConversation(@PathVariable Long receiverId, @PageableDefault(size = 10) Pageable pageable){
         return chatService.findConversation(receiverId, pageable);
+    }
+
+    @GetMapping("/{receiverId}/new")
+    @ResponseStatus(HttpStatus.OK)
+    public List<MessageResponseDTO> findNewMessages(@PathVariable Long receiverId, @RequestParam LocalDateTime after) {
+        return chatService.findNewMessages(receiverId, after);
     }
 
 }

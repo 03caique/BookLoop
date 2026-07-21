@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,6 +97,33 @@ public class ChatService {
 
             return dto;
         });
+    }
+
+    public List<MessageResponseDTO> findNewMessages(Long userId, LocalDateTime after) {
+        User loggedUser = loggedUserService.getLoggedUser();
+        User receiver = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+
+        Long userAId = Math.min(loggedUser.getId(), receiver.getId());
+        Long userBId = Math.max(loggedUser.getId(), receiver.getId());
+
+        if (!matchRepository.existsByUserAIdAndUserBId(userAId, userBId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Os usuários não possuem um match ativo");
+        }
+
+        List<Message> messages = messageRepository.findNewMessages(loggedUser.getId(), receiver.getId(), after);
+
+        return messages.stream().map(message -> {
+            MessageResponseDTO dto = modelMapper.map(message, MessageResponseDTO.class);
+
+            dto.setSenderId(message.getSender().getId());
+            dto.setSenderName(message.getSender().getName());
+
+            dto.setReceiverId(message.getReceiver().getId());
+            dto.setReceiverName(message.getReceiver().getName());
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
 }

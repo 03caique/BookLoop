@@ -30,3 +30,19 @@ export async function getConversation(
 
   return response.data;
 }
+
+export async function getNewMessages(
+  receiverId: number,
+  after: string
+) {
+  const response = await api.get(
+    `/api/messages/${receiverId}/new`,
+    {
+      params: {
+        after,
+      },
+    }
+  );
+
+  return response.data;
+}

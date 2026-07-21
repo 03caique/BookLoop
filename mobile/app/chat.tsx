@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import { useAuth } from "../contexts/AuthContext";
 import { useChatViewModel } from "../viewmodels/useChatViewModel";
-import { useRef } from "react";
 
 export default function Chat() {
   const { receiverId, receiverName } = useLocalSearchParams<{
@@ -24,7 +23,6 @@ export default function Chat() {
   const { userId } = useAuth();
   const vm = useChatViewModel(Number(receiverId));
   const router = useRouter();
-  const flatListRef = useRef<FlatList>(null);
 
   if (vm.loading && vm.messages.length === 0) {
     return (
@@ -69,15 +67,12 @@ export default function Chat() {
 
         <View style={styles.container}>
           <FlatList
-            ref={flatListRef}
-            data={vm.messages}
+            data={[...vm.messages].reverse()}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.messagesContainer}
             keyboardShouldPersistTaps="handled"
-            onContentSizeChange={() =>
-              flatListRef.current?.scrollToEnd({ animated: true })
-            }
             showsVerticalScrollIndicator={false}
+            inverted
             renderItem={({ item }) => {
               const isMine = item.senderId === userId;
               return (
@@ -210,8 +205,8 @@ const styles = StyleSheet.create({
   },
 
   messagesContainer: {
-    paddingTop: 16,
-    paddingBottom: 12,
+    paddingTop: 12,
+    paddingBottom: 16,
   },
 
   messageRow: {
