@@ -2,12 +2,17 @@ import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { MatchResponseDTO } from "../models/Match";
 import { matchService } from "../services/matchService";
+import { transactionService } from "../services/transactionService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function useMatchesViewModel() {
   const [matches, setMatches] = useState<MatchResponseDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [confirmingTransactionId, setConfirmingTransactionId] = useState<
+    number | null
+  >(null);
 
   const loadMatches = useCallback(async () => {
     try {
@@ -37,6 +42,48 @@ export function useMatchesViewModel() {
     loadMatches();
   }, [loadMatches]);
 
+  const confirmDelivery = useCallback(
+    (transactionId: number) => {
+      Alert.alert(
+        "Confirmar entrega",
+        "Você confirma que o livro foi entregue ao requisitante?",
+        [
+          {
+            text: "Cancelar",
+            style: "cancel",
+          },
+          {
+            text: "Confirmar",
+            onPress: async () => {
+              try {
+                setConfirmingTransactionId(transactionId);
+
+                await transactionService.confirmDelivery(transactionId);
+
+                Alert.alert(
+                  "Entrega confirmada",
+                  "A entrega do livro foi confirmada com sucesso.",
+                );
+
+                await loadMatches();
+              } catch (err) {
+                console.error(err);
+
+                Alert.alert(
+                  "Erro",
+                  "Não foi possível confirmar a entrega do livro.",
+                );
+              } finally {
+                setConfirmingTransactionId(null);
+              }
+            },
+          },
+        ],
+      );
+    },
+    [loadMatches],
+  );
+
   const refresh = loadMatches;
 
   return {
@@ -44,5 +91,7 @@ export function useMatchesViewModel() {
     loading,
     error,
     refresh,
+    confirmDelivery,
+    confirmingTransactionId,
   };
 }

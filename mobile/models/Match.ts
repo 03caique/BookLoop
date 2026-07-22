@@ -1,4 +1,6 @@
-export interface MatchResponseDTO{
+export type TransactionStatus = "PENDENTE" | "FINALIZADA";
+
+export interface MatchResponseDTO {
   matchId: number;
 
   otherUserId: number;
@@ -9,4 +11,7 @@ export interface MatchResponseDTO{
 
   otherBookId: number;
   otherBookTitle: string;
+
+  myTransactionId: number;
+  myTransactionStatus: TransactionStatus;
 }

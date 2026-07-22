@@ -11,8 +11,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useMatchesViewModel } from "../viewmodels/useMatchesViewModel";
 import { BottomNavigation } from "../components/BottomNavigation";
+import { useMatchesViewModel } from "../viewmodels/useMatchesViewModel";
 
 export default function MatchesScreen() {
   const vm = useMatchesViewModel();
@@ -158,12 +158,39 @@ export default function MatchesScreen() {
                   <Text style={styles.buttonText}>Entrar em contato</Text>
                 </LinearGradient>
               </TouchableOpacity>
+              {item.myTransactionStatus === "PENDENTE" ? (
+                <TouchableOpacity
+                  style={styles.confirmButton}
+                  onPress={() => vm.confirmDelivery(item.myTransactionId)}
+                  disabled={vm.confirmingTransactionId === item.myTransactionId}
+                >
+                  <LinearGradient
+                    colors={["#66BB6A", "#26A69A"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.buttonGradient}
+                  >
+                    {vm.confirmingTransactionId === item.myTransactionId ? (
+                      <ActivityIndicator size="small" color="#FFF" />
+                    ) : (
+                      <>
+                        <Feather name="check-circle" size={18} color="#FFF" />
+                        <Text style={styles.buttonText}>Confirmar entrega</Text>
+                      </>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.deliveredContainer}>
+                  <Feather name="check-circle" size={18} color="#2E7D32" />
+                  <Text style={styles.deliveredText}>Entrega confirmada</Text>
+                </View>
+              )}
             </View>
           )}
         />
 
         <BottomNavigation />
-        
       </LinearGradient>
     </SafeAreaView>
   );
@@ -358,5 +385,28 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#E53935",
     fontSize: 16,
+  },
+
+  deliveredContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E8F5E9",
+    borderRadius: 16,
+    paddingVertical: 16,
+    marginTop: 10,
+  },
+
+  deliveredText: {
+    color: "#2E7D32",
+    fontWeight: "700",
+    fontSize: 16,
+    marginLeft: 8,
+  },
+
+  confirmButton: {
+    borderRadius: 16,
+    overflow: "hidden",
+    marginTop: 10,
   },
 });
