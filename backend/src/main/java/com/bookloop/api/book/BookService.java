@@ -107,7 +107,7 @@ public class BookService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        List<Book> books = bookRepository.findByUserId(id);
+        List<Book> books = bookRepository.findByUserIdAndStatusNot(id, BookStatus.INATIVO);
 
         return books.stream()
                 .map(book -> modelMapper.map(book, BookResponseDTO.class))
@@ -138,5 +138,20 @@ public class BookService {
         responseDTO.setUserName(updatedBook.getUser().getName());
 
         return responseDTO;
+    }
+
+    public void delete(Long bookId) {
+        User loggedUser = loggedUserService.getLoggedUser();
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));
+
+        if (!book.getUser().getId().equals(loggedUser.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "O usuário não possui permissão para remover este livro");
+        }
+
+        book.setStatus(BookStatus.INATIVO);
+
+        bookRepository.save(book);
     }
 }
