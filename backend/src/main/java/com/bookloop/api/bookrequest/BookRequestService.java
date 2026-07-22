@@ -8,16 +8,20 @@ import com.bookloop.api.bookrequest.dto.BookRequestUpdateDTO;
 import com.bookloop.api.match.MatchService;
 import com.bookloop.api.notification.NotificationService;
 import com.bookloop.api.security.LoggedUserService;
+import com.bookloop.api.socioeconomicprofile.SocioeconomicProfile;
+import com.bookloop.api.socioeconomicprofile.SocioeconomicProfileRepository;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -32,6 +36,7 @@ public class BookRequestService {
     private final MatchService matchService;
     private final LoggedUserService loggedUserService;
     private final NotificationService notificationService;
+    private final SocioeconomicProfileRepository socioeconomicProfileRepository;
 
     public BookRequestResponseDTO create(BookRequestRequestDTO dto) {
 
@@ -75,22 +80,40 @@ public class BookRequestService {
     }
 
     public Page<BookRequestResponseDTO> findByProponent(Long proponentId, Pageable pageable) {
-        Page<BookRequest> bookRequests = bookRequestRepository.findByBookUserIdAndStatus(proponentId, BookRequestStatus.PENDENTE, pageable);
+        List<BookRequest> bookRequests = bookRequestRepository.findByBookUserIdAndStatus(proponentId, BookRequestStatus.PENDENTE);
 
-        return bookRequests.map(bookRequest -> {
+        List<PrioritizedBookRequest> prioritizedRequests = bookRequests.stream().map(bookRequest -> {
+            Integer priority = socioeconomicProfileRepository
+                    .findByUserId(bookRequest.getRequester().getId())
+                    .map(SocioeconomicProfile::calculatePriority)
+                    .orElse(null);
+
+            return new PrioritizedBookRequest(bookRequest, priority);
+        }).sorted(Comparator.comparing(PrioritizedBookRequest::priority, Comparator.nullsLast(Comparator.reverseOrder()))).toList();
+
+        int start = (int) pageable.getOffset();
+
+        if (start >= prioritizedRequests.size()) {
+            return new PageImpl<>(List.of(), pageable, prioritizedRequests.size());
+        }
+
+        int end = Math.min(start + pageable.getPageSize(), prioritizedRequests.size());
+
+        List<BookRequestResponseDTO> content = prioritizedRequests.subList(start, end).stream().map(item -> {
+
+            BookRequest bookRequest = item.bookRequest();
+
             BookRequestResponseDTO dto = modelMapper.map(bookRequest, BookRequestResponseDTO.class);
 
             dto.setBookId(bookRequest.getBook().getId());
-
             dto.setBookTitle(bookRequest.getBook().getTitle());
-
             dto.setRequesterId(bookRequest.getRequester().getId());
-
             dto.setRequesterName(bookRequest.getRequester().getName());
 
             return dto;
-        });
+        }).toList();
 
+        return new PageImpl<>(content, pageable, prioritizedRequests.size());
     }
 
     public BookRequestResponseDTO updateStatus(Long bookRequestId, BookRequestUpdateDTO updateDTO) {
@@ -159,5 +182,7 @@ public class BookRequestService {
         });
 
     }
+
+    private record PrioritizedBookRequest(BookRequest bookRequest, Integer priority){}
 
 }

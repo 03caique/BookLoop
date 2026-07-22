@@ -13,10 +13,9 @@ public interface BookRequestRepository extends JpaRepository<BookRequest, Long> 
         Long requesterId
     );
 
-    Page<BookRequest> findByBookUserIdAndStatus(
+    List<BookRequest> findByBookUserIdAndStatus(
             Long proponentId,
-            BookRequestStatus status,
-            Pageable pageable
+            BookRequestStatus status
     );
 
     List<BookRequest> findByRequesterIdAndBookUserIdAndStatus(
