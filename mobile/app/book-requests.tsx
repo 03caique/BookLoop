@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
+import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -10,10 +11,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { BookRequestStatus } from "../models/BookRequest";
-import { useNotificationViewModel } from "../viewmodels/useNotificationViewModel";
+import { BookRequestStatus, PriorityLevel } from "../models/BookRequest";
 import { useBookRequestViewModel } from "../viewmodels/useBookRequestViewModel";
-import React, { useEffect } from "react";
+import { useNotificationViewModel } from "../viewmodels/useNotificationViewModel";
 
 export default function BookRequestsScreen() {
   const vm = useBookRequestViewModel();
@@ -31,6 +31,53 @@ export default function BookRequestsScreen() {
         return "#D32F2F";
       default:
         return "#F9A825";
+    }
+  };
+
+  const renderPriorityLevel = (priorityLevel: PriorityLevel | null) => {
+    if (!priorityLevel) return null;
+
+    switch (priorityLevel.toUpperCase()) {
+      case "ALTA":
+        return "Alta prioridade";
+      case "MEDIA":
+        return "Média prioridade";
+      case "BAIXA":
+        return "Baixa prioridade";
+      default:
+        return priorityLevel;
+    }
+  };
+
+  const getPriorityColors = (priorityLevel: PriorityLevel | null) => {
+    if (!priorityLevel) {
+      return {
+        background: "#F5F5F5",
+        text: "#757575",
+        icon: "#757575",
+      };
+    }
+
+    switch (priorityLevel.toUpperCase()) {
+      case "ALTA":
+        return {
+          background: "#FFEBEE",
+          text: "#C62828",
+          icon: "#C62828",
+        };
+      case "MEDIA":
+        return {
+          background: "#FFF8E1",
+          text: "#F57F17",
+          icon: "#F57F17",
+        };
+      case "BAIXA":
+      default:
+        return {
+          background: "#E8F5E9",
+          text: "#2E7D32",
+          icon: "#2E7D32",
+        };
     }
   };
 
@@ -81,6 +128,38 @@ export default function BookRequestsScreen() {
                   <Text style={styles.user}>
                     Solicitado por: {item.requesterName}
                   </Text>
+
+                  {item.hasSocioeconomicProfile && (
+                    <View style={styles.priorityContainer}>
+                      <View
+                        style={[
+                          styles.priorityBadge,
+                          {
+                            backgroundColor: getPriorityColors(
+                              item.priorityLevel,
+                            ).background,
+                          },
+                        ]}
+                      >
+                        <Feather
+                          name="star"
+                          size={15}
+                          color={getPriorityColors(item.priorityLevel).icon}
+                        />
+
+                        <Text
+                          style={[
+                            styles.priorityText,
+                            {
+                              color: getPriorityColors(item.priorityLevel).text,
+                            },
+                          ]}
+                        >
+                          {renderPriorityLevel(item.priorityLevel)}
+                        </Text>
+                      </View>
+                    </View>
+                  )}
 
                   <Text
                     style={[
@@ -208,5 +287,24 @@ const styles = StyleSheet.create({
     marginTop: 50,
     color: "#666",
     fontSize: 16,
+  },
+
+  priorityContainer: {
+    marginTop: 10,
+  },
+
+  priorityBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+
+  priorityText: {
+    marginLeft: 5,
+    fontSize: 13,
+    fontWeight: "600",
   },
 });

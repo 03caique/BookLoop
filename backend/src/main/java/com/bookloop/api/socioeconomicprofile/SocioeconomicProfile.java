@@ -83,4 +83,18 @@ public class SocioeconomicProfile {
         return calculateIncomePriority()
                 + calculateEducationPriority();
     }
+
+    public PriorityLevel calculatePriorityLevel() {
+        int priority = calculatePriority();
+
+        if (priority >= 61) {
+            return PriorityLevel.ALTA;
+        }
+
+        if (priority >= 31) {
+            return PriorityLevel.MEDIA;
+        }
+
+        return PriorityLevel.BAIXA;
+    }
 }

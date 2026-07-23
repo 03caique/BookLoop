@@ -15,7 +15,12 @@ export interface BookRequestResponseDTO {
 
   bookTitle: string;
   requesterName: string;
+
+  priorityLevel: PriorityLevel | null;
+  hasSocioeconomicProfile: boolean;
 }
+
+export type PriorityLevel = "ALTA" | "MEDIA" | "BAIXA";
 
 export interface BookRequestUpdateDTO {
   status: Exclude<BookRequestStatus, "PENDENTE">;

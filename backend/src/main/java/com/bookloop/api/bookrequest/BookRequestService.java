@@ -110,6 +110,19 @@ public class BookRequestService {
             dto.setRequesterId(bookRequest.getRequester().getId());
             dto.setRequesterName(bookRequest.getRequester().getName());
 
+            socioeconomicProfileRepository
+                    .findByUserId(bookRequest.getRequester().getId())
+                    .ifPresentOrElse(
+                            profile -> {
+                                dto.setHasSocioeconomicProfile(true);
+                                dto.setPriorityLevel(profile.calculatePriorityLevel());
+                            },
+                            () -> {
+                                dto.setHasSocioeconomicProfile(false);
+                                dto.setPriorityLevel(null);
+                            }
+                    );
+
             return dto;
         }).toList();
 
