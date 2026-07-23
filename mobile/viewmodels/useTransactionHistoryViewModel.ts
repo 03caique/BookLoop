@@ -8,10 +8,10 @@ export function useTransactionHistoryViewModel(){
     const{
         userId,
     }=useAuth();
-    const [Transactions, setTransactions]=useState<Transaction[]>([]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading]=useState(false);
 
-    async function loadingTransactions() {
+    async function loadTransactions() {
         if(!userId){
             return;
         }
@@ -28,12 +28,12 @@ export function useTransactionHistoryViewModel(){
             setLoading(false);
         }
     }
-    useEffect(()=>{
-        loadingTransactions();
-    }, []);
+    useEffect(() => {
+      loadTransactions();
+    }, [userId]);
     return{
-        Transactions,
+        transactions,
         loading,
-        loadingTransactions,
+        loadTransactions,
     };
 }

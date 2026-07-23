@@ -1,7 +1,6 @@
 export type TransactionStatus= 
 | "PENDENTE"
-| "EM_ANDAMENTO"
-| "CONCLUIDA"
+| "FINALIZADA"
 | "CANCELADA";
 
 export interface Transaction{
@@ -12,5 +11,7 @@ export interface Transaction{
     bookTitle: string;
     proponentId: number;
     proponentName: string;
-    createAt: string;
+    requesterId: number;
+    requesterName: string;
+    createdAt: string | null;
 }

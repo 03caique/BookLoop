@@ -6,7 +6,7 @@ export async function getTransactionByUser(
 ): Promise<Transaction[]>{
 
     const response=await api.get(
-        "/api/Transactions",
+        "/api/transactions",
         {
             params: {
                 usuarioId: userId
