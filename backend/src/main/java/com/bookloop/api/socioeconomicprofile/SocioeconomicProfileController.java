@@ -2,6 +2,7 @@ package com.bookloop.api.socioeconomicprofile;
 
 import com.bookloop.api.socioeconomicprofile.dto.SocioeconomicProfileRequestDTO;
 import com.bookloop.api.socioeconomicprofile.dto.SocioeconomicProfileResponseDTO;
+import com.bookloop.api.socioeconomicprofile.dto.SocioeconomicProfileUpdateDTO;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,4 +21,16 @@ public class SocioeconomicProfileController {
         return service.create(dto);
     }
 
+    @GetMapping("/{userId}")
+    public SocioeconomicProfileResponseDTO findByUserId(@PathVariable Long userId) {
+        return service.findByUserId(userId);
+    }
+
+    @PutMapping("/{userId}")
+    public SocioeconomicProfileResponseDTO update(
+            @PathVariable Long userId,
+            @Valid @RequestBody SocioeconomicProfileUpdateDTO dto
+    ) {
+        return service.update(userId, dto);
+    }
 }
