@@ -135,6 +135,7 @@ public class BookRequestService {
         BookRequest updatedRequest = bookRequestRepository.save(bookRequest);
 
         if (updatedRequest.getStatus() == BookRequestStatus.ACEITA) {
+            notificationService.createRequestAcceptedNotification(updatedRequest);
             matchService.checkForMatch(updatedRequest);
         }
 

@@ -1,9 +1,9 @@
 package com.bookloop.api.notification;
 
-import com.bookloop.api.book.dto.BookResponseDTO;
 import com.bookloop.api.bookrequest.BookRequest;
 import com.bookloop.api.match.Match;
 import com.bookloop.api.security.LoggedUserService;
+import com.bookloop.api.transaction.Transaction;
 import com.bookloop.api.user.User;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -102,6 +102,44 @@ public class NotificationService {
         notificationForB.setType(NotificationType.MATCH_CRIADO);
         notificationForB.setCreatedAt(LocalDateTime.now());
         repository.save(notificationForB);
+    }
+
+    public void createRequestAcceptedNotification(BookRequest bookRequest) {
+        User requester = bookRequest.getRequester();
+        User owner = bookRequest.getBook().getUser();
+        String title = bookRequest.getBook().getTitle();
+
+        Notification notification = new Notification();
+
+        notification.setUser(requester);
+        notification.setType(NotificationType.SOLICITACAO_ACEITA);
+        notification.setTitle("Solicitação aceita!");
+        notification.setMessage(
+                owner.getName() + " aceitou sua solicitação pelo livro \"" + title + "\"."
+        );
+        notification.setRead(false);
+        notification.setCreatedAt(LocalDateTime.now());
+
+        repository.save(notification);
+    }
+
+    public void createTransactionFinishedNotification(Transaction transaction) {
+        User requester = transaction.getRequester();
+        User proponent = transaction.getProponent();
+        String title = transaction.getBook().getTitle();
+
+        Notification notification = new Notification();
+
+        notification.setUser(requester);
+        notification.setType(NotificationType.TRANSACAO_FINALIZADA);
+        notification.setTitle("Entrega confirmada!");
+        notification.setMessage(
+                proponent.getName() + " confirmou a entrega do livro \"" + title + "\"."
+        );
+        notification.setRead(false);
+        notification.setCreatedAt(LocalDateTime.now());
+
+        repository.save(notification);
     }
 }
 

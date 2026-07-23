@@ -18,8 +18,12 @@ export default function NotificationsScreen() {
   const vm = useNotificationViewModel();
 
   useEffect(() => {
-    vm.loadNotifications();
-  }, []);
+    vm.startPolling();
+
+    return () => {
+      vm.stopPolling();
+    };
+  }, [vm.startPolling, vm.stopPolling]);
 
   const getIcon = (notification: Notification) => {
     if (notification.type === "MATCH_CRIADO") {

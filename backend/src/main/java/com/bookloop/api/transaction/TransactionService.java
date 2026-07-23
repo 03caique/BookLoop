@@ -5,6 +5,7 @@ import com.bookloop.api.book.dto.BookResponseDTO;
 import com.bookloop.api.match.Match;
 import com.bookloop.api.match.MatchRepository;
 import com.bookloop.api.match.MatchStatus;
+import com.bookloop.api.notification.NotificationService;
 import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.user.User;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,7 @@ public class TransactionService {
     private final LoggedUserService loggedUserService;
     private final MatchRepository matchRepository;
     private final ModelMapper modelMapper;
+    private final NotificationService notificationService;
 
     public void confirmDelivery(Long id) {
         Transaction transaction = transactionRepository.findById(id)
@@ -45,6 +47,8 @@ public class TransactionService {
         transaction.setStatus(TransactionStatus.FINALIZADA);
 
         transactionRepository.save(transaction);
+
+        notificationService.createTransactionFinishedNotification(transaction);
 
         List<Transaction> transactions = transactionRepository.findByMatchId(transaction.getMatch().getId());
 

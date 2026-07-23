@@ -44,12 +44,14 @@ export function useNotificationViewModel() {
       return;
     }
 
+    await loadNotifications();
     await loadUnreadCount();
 
     intervalRef.current = setInterval(() => {
+      loadNotifications();
       loadUnreadCount();
     }, 10000);
-  }, [loadUnreadCount]);
+  }, [loadNotifications, loadUnreadCount]);
 
   const stopPolling = useCallback(() => {
     if (intervalRef.current) {
@@ -73,10 +75,15 @@ export function useNotificationViewModel() {
           await loadUnreadCount();
         }
 
-        if (notification.type === "SOLICITACAO_RECEBIDA") {
+        if (
+          notification.type === "SOLICITACAO_RECEBIDA" ||
+          notification.type === "SOLICITACAO_ACEITA"
+        ) {
           router.push("/book-requests");
         } else if (notification.type === "MATCH_CRIADO") {
           router.push("/matches");
+        } else if (notification.type === "TRANSACAO_FINALIZADA") {
+          router.push("/transaction-history");
         }
       } catch (error) {
         Alert.alert("Erro", "Não foi possível abrir a notificação.");
@@ -87,7 +94,7 @@ export function useNotificationViewModel() {
 
   const markAllAsRead = useCallback(async () => {
     try {
-      const data = await getNotifications("SOLICITACAO_RECEBIDA");
+      const data = await getNotifications();
 
       const unreadNotifications = data.filter(
         (notification) => !notification.read,
