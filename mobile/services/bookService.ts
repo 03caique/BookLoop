@@ -95,3 +95,11 @@ export async function findBookByIsbn(
 
   return response.data;
 }
+
+export async function deleteBook(
+  id: number
+) {
+  await api.delete(
+    `/api/books/${id}`
+  );
+}

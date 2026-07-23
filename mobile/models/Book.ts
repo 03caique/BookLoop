@@ -8,7 +8,7 @@ export interface Book {
   isbn: string;
   description: string;
 
-  status: "DOACAO" | "TROCA";
+  status: "DOACAO" | "TROCA" | "INATIVO";
 
   userId?: number;
   userName?: string;

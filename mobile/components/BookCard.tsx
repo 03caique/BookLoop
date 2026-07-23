@@ -8,6 +8,8 @@ interface BookCardProps {
   onPress: () => void;
   showEditButton?: boolean;
   onEdit?: () => void;
+  showDeleteButton?: boolean;
+  onDelete?: () => void;
 }
 
 export function BookCard({
@@ -15,17 +17,31 @@ export function BookCard({
   onPress,
   showEditButton = false,
   onEdit,
+  showDeleteButton = false,
+  onDelete,
 }: BookCardProps) {
   const imageUrl = book.photos?.length
     ? `${process.env.EXPO_PUBLIC_API_URL}${book.photos[0].imageUrl}`
     : null;
 
+  const hasActionButtons = showEditButton || showDeleteButton;
+
   return (
     <View style={styles.card}>
-      {showEditButton && (
-        <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-          <Feather name="edit-2" size={18} color="#2E7D32" />
-        </TouchableOpacity>
+      {hasActionButtons && (
+        <View style={styles.actionButtons}>
+          {showEditButton && (
+            <TouchableOpacity style={styles.editButton} onPress={onEdit}>
+              <Feather name="edit-2" size={18} color="#2E7D32" />
+            </TouchableOpacity>
+          )}
+
+          {showDeleteButton && (
+            <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
+              <Feather name="trash-2" size={18} color="#D32F2F" />
+            </TouchableOpacity>
+          )}
+        </View>
       )}
 
       <TouchableOpacity style={styles.cardContent} onPress={onPress}>
@@ -38,15 +54,32 @@ export function BookCard({
         )}
 
         <View style={styles.info}>
-          <Text style={styles.title}>{book.title}</Text>
-
-          <Text style={styles.text}>Autor: {book.author}</Text>
-
-          <Text style={styles.text}>
-            Para: {book.status === "DOACAO" ? "Doação" : "Troca"}
+          <Text
+            style={[
+              styles.title,
+              hasActionButtons && styles.titleWithActions,
+            ]}
+            numberOfLines={1}
+          >
+            {book.title}
           </Text>
 
-          <Text style={styles.text}>Dono: {book.userName}</Text>
+          <View style={styles.infoRow}>
+            <Feather name="edit-3" size={12} color="#81C784" />
+            <Text style={styles.text} numberOfLines={1}>{book.author}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Feather name="tag" size={12} color="#81C784" />
+            <Text style={styles.text}>
+              {book.status === "DOACAO" ? "Doação" : "Troca"}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Feather name="user" size={12} color="#81C784" />
+            <Text style={styles.text} numberOfLines={1}>{book.userName}</Text>
+          </View>
         </View>
       </TouchableOpacity>
     </View>
@@ -55,13 +88,19 @@ export function BookCard({
 
 const styles = StyleSheet.create({
   card: {
-  backgroundColor: "#FFF",
-  borderRadius: 20,
-  padding: 16,
-  marginBottom: 16,
-  elevation: 3,
-  position: "relative",
-},
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#C8E6C9",
+    padding: 16,
+    marginBottom: 16,
+    position: "relative",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
 
   image: {
     width: 100,
@@ -81,6 +120,7 @@ const styles = StyleSheet.create({
   info: {
     flex: 1,
     marginLeft: 16,
+    minWidth: 0,
   },
 
   title: {
@@ -90,28 +130,63 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
+  titleWithActions: {
+    paddingRight: 76,
+  },
+
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+
   text: {
     color: "#555",
-    marginBottom: 2,
+    marginLeft: 6,
+    fontSize: 13,
+    flexShrink: 1,
   },
 
   editButton: {
-  position: "absolute",
-  top: 12,
-  right: 12,
-  width: 34,
-  height: 34,
-  borderRadius: 17,
-  backgroundColor: "#FFF",
-  justifyContent: "center",
-  alignItems: "center",
-  elevation: 3,
-  zIndex: 10,
-},
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
 
-cardContent: {
-  flexDirection: "row",
-  flex: 1,
-  alignItems: "center",
-},
+  cardContent: {
+    flexDirection: "row",
+    flex: 1,
+    alignItems: "center",
+  },
+
+  actionButtons: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    flexDirection: "row",
+    gap: 8,
+    zIndex: 10,
+  },
+
+  deleteButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#FFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
 });

@@ -194,6 +194,8 @@ export default function Profile() {
                 },
               })
             }
+            showDeleteButton
+            onDelete={() => vm.handleDeleteBook(book.id!)}
           />
         ))}
       </ScrollView>
