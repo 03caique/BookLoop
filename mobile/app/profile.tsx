@@ -154,6 +154,19 @@ export default function Profile() {
               <Feather name="chevron-right" size={22} color="#999" />
             </TouchableOpacity>
 
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => router.push("/transaction-history")}
+            >
+              <View style={styles.menuLeft}>
+                <Feather name="clock" size={22} color="#2E7D32" />
+
+                <Text style={styles.menuText}>Histórico de transações</Text>
+              </View>
+
+              <Feather name="chevron-right" size={22} color="#999" />
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
               <View style={styles.menuLeft}>
                 <Feather name="log-out" size={22} color="#D32F2F" />
