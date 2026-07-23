@@ -15,3 +15,9 @@ export async function getTransactionByUser(
     );
     return response.data.content;
 }
+
+export const transactionService = {
+  async confirmDelivery(transactionId: number): Promise<void> {
+    await api.put(`/api/transactions/${transactionId}/confirmar`);
+  },
+};

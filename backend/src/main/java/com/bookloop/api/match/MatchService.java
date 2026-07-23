@@ -109,9 +109,15 @@ public class MatchService {
     }
 
     private MatchResponseDTO toResponse(Match match, Long userId) {
-
         MatchResponseDTO dto = new MatchResponseDTO();
         dto.setMatchId(match.getId());
+
+        Transaction myTransaction = transactionRepository
+                .findByMatchIdAndProponentId(match.getId(), userId)
+                .orElseThrow();
+
+        dto.setMyTransactionId(myTransaction.getId());
+        dto.setMyTransactionStatus(myTransaction.getStatus());
 
         if (match.getUserA().getId().equals(userId)) {
 
