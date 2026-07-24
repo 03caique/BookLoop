@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { ScrollView } from "react-native";
-
+import React, { useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -21,24 +21,9 @@ import { router } from "expo-router";
 export default function SocioeconomicProfile() {
   const vm = useSocioeconomicProfileViewModel();
 
-  const educationOptions = [
-    "ENSINO_FUNDAMENTAL_INCOMPLETO",
-    "ENSINO_FUNDAMENTAL_COMPLETO",
-    "ENSINO_MEDIO_INCOMPLETO",
-    "ENSINO_MEDIO_COMPLETO",
-    "ENSINO_SUPERIOR_INCOMPLETO",
-    "ENSINO_SUPERIOR_COMPLETO",
-    "POS_GRADUACAO_INCOMPLETO",
-    "POS_GRADUACAO_COMPLETO",
-  ];
-
-  const workOptions = [
-    "EMPREGADO",
-    "DESEMPREGADO",
-    "AUTONOMO",
-    "ESTAGIARIO",
-    "ESTUDANTE",
-  ];
+  useEffect(() => {
+    vm.loadProfile();
+  }, []);
 
   return (
     <LinearGradient
@@ -169,7 +154,7 @@ export default function SocioeconomicProfile() {
           </View>
 
           <TouchableOpacity
-            onPress={vm.handleSubmit}
+            onPress={vm.editing ? vm.handleUpdate : vm.handleSubmit}
             disabled={vm.loading}
             style={styles.button}
           >
@@ -186,7 +171,13 @@ export default function SocioeconomicProfile() {
               style={styles.buttonGradient}
             >
               <Text style={styles.buttonText}>
-                {vm.loading ? "SALVANDO..." : "SALVAR"}
+                {vm.loading
+                  ? vm.editing
+                    ? "ATUALIZANDO..."
+                    : "SALVANDO..."
+                  : vm.editing
+                    ? "ATUALIZAR"
+                    : "SALVAR"}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -326,5 +317,4 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 4,
   },
-
 });

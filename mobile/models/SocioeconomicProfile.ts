@@ -1,6 +1,14 @@
-export type SocioeconomicProfile = {
-  familyIncome: string;
+export interface SocioeconomicProfile {
+  id: number;
+  familyIncome: number;
   educationLevel: string;
-  householdSize: string;
+  householdSize: number;
   workSituation: string;
-};
+}
+
+export interface SocioeconomicProfileUpdate {
+  familyIncome: number;
+  educationLevel: string;
+  householdSize: number;
+  workSituation: string;
+}
