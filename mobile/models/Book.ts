@@ -5,10 +5,12 @@ export interface Book {
 
   title: string;
   author: string;
-  isbn: string;
+  isbn?: string;
   description: string;
 
   status: "DOACAO" | "TROCA" | "INATIVO";
+
+  condition: "NOVO" | "SEMINOVO" | "BOM" | "REGULAR" | "RUIM";
 
   userId?: number;
   userName?: string;

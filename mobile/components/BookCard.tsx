@@ -55,10 +55,7 @@ export function BookCard({
 
         <View style={styles.info}>
           <Text
-            style={[
-              styles.title,
-              hasActionButtons && styles.titleWithActions,
-            ]}
+            style={[styles.title, hasActionButtons && styles.titleWithActions]}
             numberOfLines={1}
           >
             {book.title}
@@ -66,7 +63,9 @@ export function BookCard({
 
           <View style={styles.infoRow}>
             <Feather name="edit-3" size={12} color="#81C784" />
-            <Text style={styles.text} numberOfLines={1}>{book.author}</Text>
+            <Text style={styles.text} numberOfLines={1}>
+              {book.author}
+            </Text>
           </View>
 
           <View style={styles.infoRow}>
@@ -77,8 +76,26 @@ export function BookCard({
           </View>
 
           <View style={styles.infoRow}>
+            <Feather name="star" size={12} color="#81C784" />
+            <Text style={styles.text}>
+              Estado:{" "}
+              {book.condition === "NOVO"
+                ? "Novo"
+                : book.condition === "SEMINOVO"
+                  ? "Seminovo"
+                  : book.condition === "BOM"
+                    ? "Bom"
+                    : book.condition === "REGULAR"
+                      ? "Regular"
+                      : "Ruim"}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
             <Feather name="user" size={12} color="#81C784" />
-            <Text style={styles.text} numberOfLines={1}>{book.userName}</Text>
+            <Text style={styles.text} numberOfLines={1}>
+              {book.userName}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>

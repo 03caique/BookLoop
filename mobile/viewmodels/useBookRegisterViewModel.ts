@@ -18,6 +18,9 @@ export function useBookRegisterViewModel() {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<"DOACAO" | "TROCA">("DOACAO");
+  const [condition, setCondition] = useState<
+    "NOVO" | "SEMINOVO" | "BOM" | "REGULAR" | "RUIM"
+  >("BOM");
   const [photos, setPhotos] = useState<ImagePickerAsset[]>([]);
   const { id } = useLocalSearchParams();
   const isEditing = !!id;
@@ -37,6 +40,7 @@ export function useBookRegisterViewModel() {
         setIsbn(book.isbn);
         setDescription(book.description);
         setStatus(book.status);
+        setCondition(book.condition);
         setExistingPhotos(book.photos.map((photo: any) => photo.imageUrl));
       } catch (error) {
         console.log(error);
@@ -75,12 +79,7 @@ export function useBookRegisterViewModel() {
   }
 
   async function handleRegisterBook() {
-    if (
-      !title.trim() ||
-      !author.trim() ||
-      !isbn.trim() ||
-      !description.trim()
-    ) {
+    if (!title.trim() || !author.trim() || !description.trim()) {
       Alert.alert("Erro", "Preencha todos os campos");
 
       return;
@@ -111,6 +110,7 @@ export function useBookRegisterViewModel() {
         isbn,
         description,
         status,
+        condition,
         photos: photoUrls,
       });
 
@@ -157,6 +157,7 @@ export function useBookRegisterViewModel() {
         isbn,
         description,
         status,
+        condition,
         photos: [...existingPhotos, ...newPhotoUrls],
       });
 
@@ -254,5 +255,8 @@ export function useBookRegisterViewModel() {
 
     handleRegisterBook,
     handleUpdateBook,
+
+    condition,
+    setCondition,
   };
 }

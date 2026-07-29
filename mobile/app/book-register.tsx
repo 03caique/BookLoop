@@ -18,6 +18,15 @@ import { useBookRegisterViewModel } from "../viewmodels/useBookRegisterViewModel
 export default function BookRegister() {
   const vm = useBookRegisterViewModel();
 
+  const conditionDescriptions = {
+    NOVO: "Nunca usado ou em estado equivalente a novo, sem sinais relevantes de uso.",
+    SEMINOVO: "Pouco usado, bem conservado, com mínimos sinais de manuseio.",
+    BOM: "Usado, mas bem conservado, podendo apresentar pequenos sinais de uso.",
+    REGULAR:
+      "Apresenta sinais visíveis de uso, mas continua em condições adequadas para leitura.",
+    RUIM: "Apresenta desgaste significativo, como marcas, rasgos ou outros danos, mas ainda pode ser lido.",
+  };
+
   return (
     <LinearGradient
       colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
@@ -129,7 +138,7 @@ export default function BookRegister() {
             />
 
             <TextInput
-              placeholder="ISBN"
+              placeholder="ISBN (opcional)"
               placeholderTextColor="#A5D6A7"
               value={vm.isbn}
               onChangeText={vm.setIsbn}
@@ -137,6 +146,48 @@ export default function BookRegister() {
               style={styles.input}
               editable={!vm.loading}
             />
+          </View>
+
+          <Text style={styles.conditionTitle}>Estado de conservação</Text>
+
+          <View style={styles.conditionContainer}>
+            {[
+              { value: "NOVO", label: "Novo" },
+              { value: "SEMINOVO", label: "Seminovo" },
+              { value: "BOM", label: "Bom" },
+              { value: "REGULAR", label: "Regular" },
+              { value: "RUIM", label: "Ruim" },
+            ].map((item) => (
+              <TouchableOpacity
+                key={item.value}
+                style={[
+                  styles.conditionButton,
+                  vm.condition === item.value && styles.activeConditionButton,
+                ]}
+                onPress={() =>
+                  vm.setCondition(item.value as typeof vm.condition)
+                }
+                disabled={vm.loading}
+              >
+                <Text
+                  style={[
+                    styles.conditionButtonText,
+                    vm.condition === item.value &&
+                      styles.activeConditionButtonText,
+                  ]}
+                >
+                  {item.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={styles.conditionDescription}>
+            <Feather name="info" size={16} color="#66BB6A" />
+
+            <Text style={styles.conditionDescriptionText}>
+              {conditionDescriptions[vm.condition]}
+            </Text>
           </View>
 
           <View style={[styles.inputContainer, styles.descriptionContainer]}>
@@ -443,5 +494,59 @@ const styles = StyleSheet.create({
     height: 36,
     justifyContent: "center",
     alignItems: "center",
+  },
+
+  conditionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#2E7D32",
+    marginBottom: 10,
+  },
+
+  conditionContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 20,
+  },
+
+  conditionButton: {
+    borderWidth: 2,
+    borderColor: "#C8E6C9",
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: "#FFF",
+  },
+
+  activeConditionButton: {
+    backgroundColor: "#66BB6A",
+    borderColor: "#66BB6A",
+  },
+
+  conditionButtonText: {
+    color: "#66BB6A",
+    fontWeight: "600",
+  },
+
+  activeConditionButtonText: {
+    color: "#FFF",
+  },
+
+  conditionDescription: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: "#F1F8E9",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 20,
+  },
+
+  conditionDescriptionText: {
+    flex: 1,
+    marginLeft: 8,
+    color: "#558B2F",
+    fontSize: 13,
+    lineHeight: 18,
   },
 });

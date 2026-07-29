@@ -1,5 +1,6 @@
 package com.bookloop.api.book.dto;
 
+import com.bookloop.api.book.BookCondition;
 import com.bookloop.api.book.BookStatus;
 import com.bookloop.api.book.photo.BookPhoto;
 import jakarta.validation.constraints.NotBlank;
@@ -21,6 +22,9 @@ public class BookRequestDTO {
 
     @NotBlank
     private String description;
+
+    @NotNull
+    private BookCondition condition;
 
     @NotNull
     private BookStatus status;

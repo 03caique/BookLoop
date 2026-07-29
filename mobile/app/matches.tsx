@@ -64,18 +64,6 @@ export default function MatchesScreen() {
         style={styles.container}
       >
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => {
-              if (router.canGoBack()) {
-                router.back();
-              } else {
-                router.replace("/home");
-              }
-            }}
-          >
-            <Feather name="arrow-left" size={22} color="#2E7D32" />
-          </TouchableOpacity>
           <Text style={styles.title}>Matches Ativos</Text>
           <View style={{ width: 40 }} />
         </View>
@@ -208,20 +196,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 12,
     marginBottom: 24,
-  },
-
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.9)",
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
   },
 
   title: {

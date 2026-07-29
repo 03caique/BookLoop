@@ -144,7 +144,22 @@ export default function BookDetails() {
 
           <View style={styles.infoBlock}>
             <Text style={styles.label}>ISBN</Text>
-            <Text style={styles.text}>{book.isbn}</Text>
+            <Text style={styles.text}>{book.isbn || "Não informado"}</Text>
+          </View>
+
+          <View style={styles.infoBlock}>
+            <Text style={styles.label}>Estado do livro</Text>
+            <Text style={styles.text}>
+              {book.condition === "NOVO"
+                ? "Novo"
+                : book.condition === "SEMINOVO"
+                  ? "Seminovo"
+                  : book.condition === "BOM"
+                    ? "Bom"
+                    : book.condition === "REGULAR"
+                      ? "Regular"
+                      : "Ruim"}
+            </Text>
           </View>
 
           <View style={styles.infoBlock}>

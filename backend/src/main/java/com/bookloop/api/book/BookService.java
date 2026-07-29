@@ -44,6 +44,7 @@ public class BookService {
         book.setIsbn(dto.getIsbn());
         book.setDescription(dto.getDescription());
         book.setStatus(dto.getStatus());
+        book.setCondition(dto.getCondition());
         book.setUser(loggedUser);
 
         List<BookPhoto> photos = dto.getPhotos()
@@ -129,6 +130,7 @@ public class BookService {
         book.setIsbn(requestDTO.getIsbn());
         book.setDescription(requestDTO.getDescription());
         book.setStatus(requestDTO.getStatus());
+        book.setCondition(requestDTO.getCondition());
 
         Book updatedBook = bookRepository.save(book);
 

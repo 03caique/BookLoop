@@ -34,6 +34,11 @@ public class Book {
     @NotNull
     private BookStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    @Column(name = "book_condition")
+    private BookCondition condition;
+
     @NotNull
     @ManyToOne
     @JoinColumn(name = "user_id")

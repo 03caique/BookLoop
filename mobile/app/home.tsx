@@ -1,4 +1,5 @@
 import { Feather } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import * as NavigationBar from "expo-navigation-bar";
 import { router } from "expo-router";
 import { useEffect } from "react";
@@ -45,17 +46,22 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+      <LinearGradient
+        colors={["#66BB6A", "#26A69A"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + 16 }]}
       >
-        <View style={styles.header}>
+        <View style={styles.appBarTopRow}>
           <Text style={styles.logo}>BookLoop</Text>
 
           <View style={styles.headerIcons}>
             <View>
-              <TouchableOpacity onPress={() => router.push("/notifications")}>
-                <Feather name="bell" size={24} color="#2E7D32" />
+              <TouchableOpacity
+                onPress={() => router.push("/notifications")}
+                style={styles.iconButton}
+              >
+                <Feather name="bell" size={22} color="#FFFFFF" />
               </TouchableOpacity>
 
               {notificationVm.unreadCount > 0 && (
@@ -67,15 +73,26 @@ export default function Home() {
               )}
             </View>
 
-            <TouchableOpacity onPress={() => router.push("/profile")}>
-              <Feather name="user" size={24} color="#2E7D32" />
+            <TouchableOpacity
+              onPress={() => router.push("/profile")}
+              style={styles.iconButton}
+            >
+              <Feather name="user" size={22} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.searchContainer}>
+          <Feather
+            name="search"
+            size={18}
+            color="#81C784"
+            style={styles.searchIcon}
+          />
+
           <TextInput
             placeholder="Buscar livro ou autor"
+            placeholderTextColor="#9E9E9E"
             value={vm.search}
             onChangeText={vm.setSearch}
             style={styles.searchInput}
@@ -85,10 +102,15 @@ export default function Home() {
             style={styles.searchButton}
             onPress={() => router.push(`/books?query=${vm.search}`)}
           >
-            <Feather name="search" size={20} color="#FFF" />
+            <Feather name="arrow-right" size={18} color="#FFF" />
           </TouchableOpacity>
         </View>
+      </LinearGradient>
 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
         <Text style={styles.sectionTitle}>Livros Recentes</Text>
 
         {vm.books.slice(0, 5).map((book) => (
@@ -118,23 +140,35 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8FAF8",
   },
 
-  content: {
-    padding: 20,
-    paddingTop: 60,
-    paddingBottom: 140,
+  appBar: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
 
-  header: {
+  appBarTopRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 18,
+  },
+
+  content: {
+    padding: 20,
+    paddingTop: 24,
+    paddingBottom: 140,
   },
 
   logo: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "700",
-    color: "#2E7D32",
+    color: "#FFFFFF",
   },
 
   headerIcons: {
@@ -142,25 +176,39 @@ const styles = StyleSheet.create({
     gap: 16,
   },
 
+  iconButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   searchContainer: {
     flexDirection: "row",
-    marginBottom: 24,
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    paddingLeft: 14,
+    paddingRight: 6,
+    height: 50,
+  },
+
+  searchIcon: {
+    marginRight: 8,
   },
 
   searchInput: {
     flex: 1,
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: "#C8E6C9",
+    fontSize: 15,
+    color: "#2E7D32",
   },
 
   searchButton: {
-    width: 50,
-    height: 50,
-    marginLeft: 10,
-    borderRadius: 16,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     backgroundColor: "#26a69a",
     justifyContent: "center",
     alignItems: "center",
@@ -207,20 +255,22 @@ const styles = StyleSheet.create({
 
   badge: {
     position: "absolute",
-    right: -8,
-    top: -8,
+    right: -4,
+    top: -4,
     backgroundColor: "#D32F2F",
     borderRadius: 12,
-    minWidth: 20,
-    height: 20,
+    minWidth: 18,
+    height: 18,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 5,
+    paddingHorizontal: 4,
+    borderWidth: 1.5,
+    borderColor: "#FFFFFF",
   },
 
   badgeText: {
     color: "#FFF",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "bold",
   },
 });

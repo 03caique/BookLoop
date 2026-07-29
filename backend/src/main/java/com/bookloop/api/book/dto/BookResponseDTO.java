@@ -1,5 +1,6 @@
 package com.bookloop.api.book.dto;
 
+import com.bookloop.api.book.BookCondition;
 import com.bookloop.api.book.BookStatus;
 import lombok.Data;
 import java.util.List;
@@ -11,6 +12,7 @@ public class BookResponseDTO {
     private String author;
     private String isbn;
     private String description;
+    private BookCondition condition;
     private BookStatus status;
     private Long userId;
     private String userName;
