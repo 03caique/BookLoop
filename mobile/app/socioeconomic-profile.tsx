@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BottomNavigation } from "../components/BottomNavigation";
 
@@ -17,29 +18,36 @@ import { useSocioeconomicProfileViewModel } from "../viewmodels/useSocioeconomic
 import { Picker } from "@react-native-picker/picker";
 
 import { router } from "expo-router";
+import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
 
 export default function SocioeconomicProfile() {
   const vm = useSocioeconomicProfileViewModel();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     vm.loadProfile();
   }, []);
 
   return (
-    <LinearGradient
-      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-      style={styles.gradient}
-    >
-      <ScrollView contentContainerStyle={[styles.container, { flexGrow: 1 }]}>
+    <View style={styles.screen}>
+      <LinearGradient
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
+      >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Feather name="arrow-left" size={28} color="#2E7D32" />
+            <Feather name="arrow-left" size={26} color={Palette.white} />
           </TouchableOpacity>
 
           <Text style={styles.title}>Perfil Socioeconômico</Text>
 
-          <View style={{ width: 28 }} />
+          <View style={{ width: 26 }} />
         </View>
+      </LinearGradient>
+
+      <ScrollView contentContainerStyle={[styles.container, { flexGrow: 1 }]}>
         <View style={styles.formContainer}>
           <Text style={styles.label}>Renda Familiar</Text>
 
@@ -47,13 +55,13 @@ export default function SocioeconomicProfile() {
             <Feather
               name="dollar-sign"
               size={20}
-              color="#81C784"
+              color={Palette.primaryLight}
               style={styles.icon}
             />
 
             <TextInput
               placeholder="Ex: 2500"
-              placeholderTextColor="#A5D6A7"
+              placeholderTextColor={Palette.placeholder}
               value={vm.familyIncome}
               onChangeText={vm.setFamilyIncome}
               keyboardType="numeric"
@@ -67,13 +75,13 @@ export default function SocioeconomicProfile() {
             <Feather
               name="users"
               size={20}
-              color="#81C784"
+              color={Palette.primaryLight}
               style={styles.icon}
             />
 
             <TextInput
               placeholder="Ex: 4"
-              placeholderTextColor="#A5D6A7"
+              placeholderTextColor={Palette.placeholder}
               value={vm.householdSize}
               onChangeText={vm.setHouseholdSize}
               keyboardType="numeric"
@@ -159,7 +167,7 @@ export default function SocioeconomicProfile() {
             style={styles.button}
           >
             <LinearGradient
-              colors={["#66BB6A", "#26A69A"]}
+              colors={[Palette.primary, Palette.secondary]}
               start={{
                 x: 0,
                 y: 0,
@@ -185,87 +193,102 @@ export default function SocioeconomicProfile() {
       </ScrollView>
 
       <BottomNavigation />
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: {
+  screen: {
     flex: 1,
+    backgroundColor: Palette.background,
   },
 
-  container: {
-    padding: 24,
-    paddingVertical: 40,
-    paddingBottom: 120,
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-
-    marginBottom: 30,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#2E7D32",
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: Palette.white,
+  },
+
+  container: {
+    padding: Spacing.lg,
+    paddingTop: Spacing.xl,
+    paddingBottom: 120,
   },
 
   formContainer: {
-    backgroundColor: "rgba(255,255,255,0.9)",
-    borderRadius: 24,
-    padding: 24,
-    elevation: 10,
+    backgroundColor: Palette.white,
+    borderRadius: Radius.xl,
+    padding: Spacing.xl,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
 
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
     marginBottom: 12,
     marginTop: 10,
   },
 
   optionsContainer: {
     gap: 10,
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
   },
 
   optionButton: {
     borderWidth: 2,
-    borderColor: "#C8E6C9",
-    borderRadius: 16,
+    borderColor: Palette.borderLight,
+    borderRadius: Radius.md,
     padding: 12,
-    backgroundColor: "#FFF",
+    backgroundColor: Palette.white,
   },
 
   activeOptionButton: {
-    backgroundColor: "#66BB6A",
-    borderColor: "#66BB6A",
+    backgroundColor: Palette.primary,
+    borderColor: Palette.primary,
   },
 
   optionText: {
-    color: "#2E7D32",
+    color: Palette.primaryDark,
     textAlign: "center",
     fontWeight: "600",
   },
 
   activeOptionText: {
-    color: "#FFF",
+    color: Palette.white,
   },
 
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Palette.white,
     borderWidth: 2,
-    borderColor: "#C8E6C9",
-    borderRadius: 16,
-    marginBottom: 16,
-    paddingHorizontal: 16,
+    borderColor: Palette.borderLight,
+    borderRadius: Radius.md,
+    marginBottom: Spacing.md,
+    paddingHorizontal: Spacing.md,
     height: 56,
   },
 
@@ -276,11 +299,11 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#2E7D32",
+    color: Palette.primaryDark,
   },
 
   button: {
-    borderRadius: 16,
+    borderRadius: Radius.md,
     overflow: "hidden",
     marginTop: 12,
   },
@@ -291,20 +314,20 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#FFF",
+    color: Palette.white,
     fontSize: 16,
     fontWeight: "700",
   },
 
   pickerContainer: {
-    backgroundColor: "#FFF",
+    backgroundColor: Palette.white,
 
     borderWidth: 2,
-    borderColor: "#C8E6C9",
+    borderColor: Palette.borderLight,
 
-    borderRadius: 16,
+    borderRadius: Radius.md,
 
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
 
     overflow: "hidden",
   },
@@ -312,7 +335,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "600",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
 
     marginBottom: 8,
     marginTop: 4,

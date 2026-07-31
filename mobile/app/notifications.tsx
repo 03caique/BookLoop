@@ -10,12 +10,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNotificationViewModel } from "../viewmodels/useNotificationViewModel";
 import { Notification } from "../models/Notification";
+import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
 
 export default function NotificationsScreen() {
   const vm = useNotificationViewModel();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     vm.startPolling();
@@ -29,157 +31,189 @@ export default function NotificationsScreen() {
     if (notification.type === "MATCH_CRIADO") {
       return {
         name: "repeat",
-        color: "#00c954",
+        color: Palette.matchAccent,
       };
     }
 
     return {
       name: "book-open",
-      color: "#2E7D32",
+      color: Palette.primaryDark,
     };
   };
 
   if (vm.loading) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.screen}>
         <LinearGradient
-          colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-          style={styles.container}
+          colors={[Palette.primary, Palette.secondary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
         >
-          <ActivityIndicator size="large" color="#2E7D32" />
+          <Text style={styles.title}>Notificações</Text>
         </LinearGradient>
-      </SafeAreaView>
+
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color={Palette.secondary} />
+        </View>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={styles.screen}>
       <LinearGradient
-        colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-        style={styles.container}
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
       >
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => router.back()}
+            onPress={() =>
+              router.canGoBack() ? router.back() : router.replace("/")
+            }
           >
-            <Feather name="arrow-left" size={22} color="#2E7D32" />
+            <Feather name="arrow-left" size={22} color={Palette.secondary} />
           </TouchableOpacity>
 
           <Text style={styles.title}>Notificações</Text>
 
           <View style={{ width: 40 }} />
         </View>
-
-        <FlatList
-          data={vm.notifications}
-          keyExtractor={(item) => item.id.toString()}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Feather name="bell-off" size={50} color="#81C784" />
-
-              <Text style={styles.emptyText}>
-                Nenhuma notificação encontrada.
-              </Text>
-            </View>
-          }
-          renderItem={({ item }) => {
-            const icon = getIcon(item);
-
-            return (
-              <TouchableOpacity
-                onPress={() => vm.handleNotificationPress(item)}
-                activeOpacity={0.8}
-              >
-                <View style={[styles.card, !item.read && styles.unreadCard]}>
-                  <View style={styles.row}>
-                    <View
-                      style={[
-                        styles.iconCircle,
-                        {
-                          backgroundColor: icon.color + "20",
-                        },
-                      ]}
-                    >
-                      <Feather
-                        name={icon.name as any}
-                        size={24}
-                        color={icon.color}
-                      />
-                    </View>
-
-                    <View style={styles.content}>
-                      <Text style={styles.notificationTitle}>{item.title}</Text>
-
-                      <Text style={styles.message}>{item.message}</Text>
-
-                      <Text style={styles.date}>
-                        {new Date(item.createdAt).toLocaleDateString("pt-BR")}
-                      </Text>
-                    </View>
-
-                    {!item.read && (
-                      <View style={styles.badge}>
-                        <Text style={styles.badgeText}>Nova</Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-        />
       </LinearGradient>
-    </SafeAreaView>
+
+      <FlatList
+        data={vm.notifications}
+        keyExtractor={(item) => item.id.toString()}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.list}
+        removeClippedSubviews={false}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Feather name="bell-off" size={50} color={Palette.primaryLight} />
+
+            <Text style={styles.emptyText}>
+              Nenhuma notificação encontrada.
+            </Text>
+          </View>
+        }
+        renderItem={({ item }) => {
+          const icon = getIcon(item);
+
+          return (
+            <TouchableOpacity
+              onPress={() => vm.handleNotificationPress(item)}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.card, !item.read && styles.unreadCard]}>
+                <View style={styles.row}>
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      {
+                        backgroundColor: icon.color + "20",
+                      },
+                    ]}
+                  >
+                    <Feather
+                      name={icon.name as any}
+                      size={24}
+                      color={icon.color}
+                    />
+                  </View>
+
+                  <View style={styles.content}>
+                    <Text style={styles.notificationTitle}>{item.title}</Text>
+
+                    <Text style={styles.message}>{item.message}</Text>
+
+                    <Text style={styles.date}>
+                      {new Date(item.createdAt).toLocaleDateString("pt-BR")}
+                    </Text>
+                  </View>
+
+                  {!item.read && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>Nova</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    paddingHorizontal: 20,
+    backgroundColor: Palette.background,
+  },
+
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+
+  centerContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 20,
-    marginBottom: 24,
   },
+
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.9)",
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: Palette.overlay,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 3,
   },
 
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2E7D32",
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: Palette.white,
   },
 
   list: {
+    padding: Spacing.lg,
     paddingBottom: 30,
   },
 
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: 24,
+    backgroundColor: Palette.white,
+    borderRadius: Radius.xl,
     padding: 18,
-    marginBottom: 16,
+    marginBottom: Spacing.md,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     elevation: 3,
   },
 
   unreadCard: {
     borderWidth: 2,
-    borderColor: "#C8E6C9",
+    borderColor: Palette.borderLight,
   },
 
   row: {
@@ -203,30 +237,30 @@ const styles = StyleSheet.create({
   notificationTitle: {
     fontSize: 17,
     fontWeight: "bold",
-    color: "#333",
+    color: Palette.textBody,
   },
 
   message: {
     marginTop: 5,
     fontSize: 14,
-    color: "#666",
+    color: Palette.textMutedAlt,
   },
 
   date: {
     marginTop: 8,
     fontSize: 12,
-    color: "#999",
+    color: Palette.textMuted,
   },
 
   badge: {
-    backgroundColor: "#2E7D32",
+    backgroundColor: Palette.primaryDark,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: Radius.sm,
   },
 
   badgeText: {
-    color: "#FFF",
+    color: Palette.white,
     fontSize: 11,
     fontWeight: "bold",
   },
@@ -237,8 +271,8 @@ const styles = StyleSheet.create({
   },
 
   emptyText: {
-    marginTop: 16,
-    color: "#757575",
+    marginTop: Spacing.md,
+    color: Palette.textLabel,
     fontSize: 16,
   },
 });

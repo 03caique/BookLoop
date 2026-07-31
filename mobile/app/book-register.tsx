@@ -12,11 +12,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useBookRegisterViewModel } from "../viewmodels/useBookRegisterViewModel";
+import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
 
 export default function BookRegister() {
   const vm = useBookRegisterViewModel();
+  const insets = useSafeAreaInsets();
 
   const conditionDescriptions = {
     NOVO: "Nunca usado ou em estado equivalente a novo, sem sinais relevantes de uso.",
@@ -28,18 +31,20 @@ export default function BookRegister() {
   };
 
   return (
-    <LinearGradient
-      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-      style={styles.gradient}
-    >
-      <ScrollView contentContainerStyle={[styles.container, { flexGrow: 1 }]}>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
+      >
         <View style={styles.header}>
           {vm.isEditing ? (
             <TouchableOpacity
               style={styles.backButton}
               onPress={() => router.back()}
             >
-              <Feather name="arrow-left" size={26} color="#2E7D32" />
+              <Feather name="arrow-left" size={26} color={Palette.white} />
             </TouchableOpacity>
           ) : (
             <View style={{ width: 26 }} />
@@ -51,7 +56,9 @@ export default function BookRegister() {
 
           <View style={{ width: 26 }} />
         </View>
+      </LinearGradient>
 
+      <ScrollView contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}>
         <View style={styles.formContainer}>
           <View style={styles.typeContainer}>
             <TouchableOpacity
@@ -97,13 +104,13 @@ export default function BookRegister() {
             <Feather
               name="book"
               size={20}
-              color="#81C784"
+              color={Palette.primaryLight}
               style={styles.icon}
             />
 
             <TextInput
               placeholder="Titulo"
-              placeholderTextColor="#A5D6A7"
+              placeholderTextColor={Palette.placeholder}
               value={vm.title}
               onChangeText={vm.setTitle}
               style={styles.input}
@@ -115,13 +122,13 @@ export default function BookRegister() {
             <Feather
               name="edit"
               size={20}
-              color="#81C784"
+              color={Palette.primaryLight}
               style={styles.icon}
             />
 
             <TextInput
               placeholder="Autor"
-              placeholderTextColor="#A5D6A7"
+              placeholderTextColor={Palette.placeholder}
               value={vm.author}
               onChangeText={vm.setAuthor}
               style={styles.input}
@@ -133,13 +140,13 @@ export default function BookRegister() {
             <Feather
               name="hash"
               size={20}
-              color="#81C784"
+              color={Palette.primaryLight}
               style={styles.icon}
             />
 
             <TextInput
               placeholder="ISBN (opcional)"
-              placeholderTextColor="#A5D6A7"
+              placeholderTextColor={Palette.placeholder}
               value={vm.isbn}
               onChangeText={vm.setIsbn}
               onBlur={vm.handleIsbnSearch}
@@ -183,7 +190,7 @@ export default function BookRegister() {
           </View>
 
           <View style={styles.conditionDescription}>
-            <Feather name="info" size={16} color="#66BB6A" />
+            <Feather name="info" size={16} color={Palette.primary} />
 
             <Text style={styles.conditionDescriptionText}>
               {conditionDescriptions[vm.condition]}
@@ -193,7 +200,7 @@ export default function BookRegister() {
           <View style={[styles.inputContainer, styles.descriptionContainer]}>
             <TextInput
               placeholder="Descrição"
-              placeholderTextColor="#A5D6A7"
+              placeholderTextColor={Palette.placeholder}
               value={vm.description}
               onChangeText={vm.setDescription}
               multiline
@@ -206,7 +213,7 @@ export default function BookRegister() {
 
           <View style={styles.photoButtonsContainer}>
             <TouchableOpacity style={styles.photoButton} onPress={vm.takePhoto}>
-              <Feather name="camera" size={22} color="#2E7D32" />
+              <Feather name="camera" size={22} color={Palette.primaryDark} />
 
               <Text style={styles.photoButtonText}>Câmera</Text>
             </TouchableOpacity>
@@ -215,7 +222,7 @@ export default function BookRegister() {
               style={styles.photoButton}
               onPress={vm.pickImages}
             >
-              <Feather name="image" size={22} color="#2E7D32" />
+              <Feather name="image" size={22} color={Palette.primaryDark} />
 
               <Text style={styles.photoButtonText}>Galeria</Text>
             </TouchableOpacity>
@@ -233,7 +240,7 @@ export default function BookRegister() {
                   style={styles.removePhotoButton}
                   onPress={() => vm.removePhoto(index)}
                 >
-                  <Feather name="x" size={16} color="#FFF" />
+                  <Feather name="x" size={16} color={Palette.white} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -245,7 +252,11 @@ export default function BookRegister() {
             style={[styles.button, vm.loading && styles.buttonDisabled]}
           >
             <LinearGradient
-              colors={vm.loading ? ["#999", "#999"] : ["#66BB6A", "#26A69A"]}
+              colors={
+                vm.loading
+                  ? [Palette.disabled, Palette.disabled]
+                  : [Palette.primary, Palette.secondary]
+              }
               start={{
                 x: 0,
                 y: 0,
@@ -271,18 +282,31 @@ export default function BookRegister() {
       </ScrollView>
 
       {!vm.isEditing && <BottomNavigation />}
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: {
+  container: {
     flex: 1,
+    backgroundColor: Palette.background,
   },
 
-  container: {
-    padding: 24,
-    paddingVertical: 40,
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+
+  scrollContent: {
+    padding: Spacing.lg,
+    paddingTop: Spacing.xl,
     paddingBottom: 120,
   },
 
@@ -290,39 +314,32 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 40,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#2E7D32",
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: Palette.white,
   },
 
   formContainer: {
-    backgroundColor: "rgba(255,255,255,0.9)",
-
-    borderRadius: 24,
-
-    padding: 24,
-
+    backgroundColor: Palette.white,
+    borderRadius: Radius.xl,
+    padding: Spacing.xl,
     shadowColor: "#000",
-
     shadowOffset: {
       width: 0,
       height: 4,
     },
-
     shadowOpacity: 0.1,
     shadowRadius: 12,
-
     zIndex: 10,
-    elevation: 10,
+    elevation: 5,
   },
 
   typeContainer: {
     flexDirection: "row",
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
     gap: 12,
   },
 
@@ -330,29 +347,29 @@ const styles = StyleSheet.create({
     flex: 1,
 
     borderWidth: 2,
-    borderColor: "#C8E6C9",
+    borderColor: Palette.borderLight,
 
-    borderRadius: 16,
+    borderRadius: Radius.md,
 
     paddingVertical: 14,
 
     alignItems: "center",
 
-    backgroundColor: "#FFF",
+    backgroundColor: Palette.white,
   },
 
   activeTypeButton: {
-    backgroundColor: "#66BB6A",
-    borderColor: "#66BB6A",
+    backgroundColor: Palette.primary,
+    borderColor: Palette.primary,
   },
 
   typeButtonText: {
-    color: "#66BB6A",
+    color: Palette.primary,
     fontWeight: "600",
   },
 
   activeTypeButtonText: {
-    color: "#FFF",
+    color: Palette.white,
   },
 
   inputContainer: {
@@ -360,16 +377,16 @@ const styles = StyleSheet.create({
 
     alignItems: "center",
 
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Palette.white,
 
     borderWidth: 2,
-    borderColor: "#C8E6C9",
+    borderColor: Palette.borderLight,
 
-    borderRadius: 16,
+    borderRadius: Radius.md,
 
-    marginBottom: 16,
+    marginBottom: Spacing.md,
 
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
 
     height: 56,
   },
@@ -377,7 +394,7 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     height: 120,
     alignItems: "flex-start",
-    paddingTop: 16,
+    paddingTop: Spacing.md,
   },
 
   icon: {
@@ -387,19 +404,19 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#2E7D32",
+    color: Palette.primaryDark,
   },
 
   descriptionInput: {
     flex: 1,
     width: "100%",
     fontSize: 16,
-    color: "#2E7D32",
+    color: Palette.primaryDark,
     textAlignVertical: "top",
   },
 
   button: {
-    borderRadius: 16,
+    borderRadius: Radius.md,
     overflow: "hidden",
     marginTop: 8,
   },
@@ -414,7 +431,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#FFFFFF",
+    color: Palette.white,
     fontSize: 16,
     fontWeight: "700",
     letterSpacing: 1,
@@ -423,7 +440,7 @@ const styles = StyleSheet.create({
   photosTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
     marginBottom: 10,
   },
 
@@ -433,20 +450,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
 
     borderWidth: 2,
-    borderColor: "#C8E6C9",
+    borderColor: Palette.borderLight,
 
-    borderRadius: 16,
+    borderRadius: Radius.md,
 
     paddingVertical: 14,
 
-    marginBottom: 16,
+    marginBottom: Spacing.md,
 
     flex: 1,
   },
 
   photoButtonText: {
     marginLeft: 8,
-    color: "#2E7D32",
+    color: Palette.primaryDark,
     fontWeight: "600",
   },
 
@@ -454,13 +471,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
   },
 
   photoPreview: {
     width: 90,
     height: 90,
-    borderRadius: 12,
+    borderRadius: Radius.sm,
   },
 
   photoWrapper: {
@@ -477,7 +494,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 12,
 
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: Palette.overlayDark,
 
     justifyContent: "center",
     alignItems: "center",
@@ -486,7 +503,7 @@ const styles = StyleSheet.create({
   photoButtonsContainer: {
     flexDirection: "row",
     gap: 12,
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
 
   backButton: {
@@ -499,7 +516,7 @@ const styles = StyleSheet.create({
   conditionTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
     marginBottom: 10,
   },
 
@@ -507,45 +524,45 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
   },
 
   conditionButton: {
     borderWidth: 2,
-    borderColor: "#C8E6C9",
-    borderRadius: 16,
+    borderColor: Palette.borderLight,
+    borderRadius: Radius.md,
     paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: "#FFF",
+    paddingHorizontal: Spacing.md,
+    backgroundColor: Palette.white,
   },
 
   activeConditionButton: {
-    backgroundColor: "#66BB6A",
-    borderColor: "#66BB6A",
+    backgroundColor: Palette.primary,
+    borderColor: Palette.primary,
   },
 
   conditionButtonText: {
-    color: "#66BB6A",
+    color: Palette.primary,
     fontWeight: "600",
   },
 
   activeConditionButtonText: {
-    color: "#FFF",
+    color: Palette.white,
   },
 
   conditionDescription: {
     flexDirection: "row",
     alignItems: "flex-start",
-    backgroundColor: "#F1F8E9",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 20,
+    backgroundColor: Palette.tint,
+    borderRadius: Radius.sm,
+    padding: Spacing.md,
+    marginBottom: Spacing.lg,
   },
 
   conditionDescriptionText: {
     flex: 1,
     marginLeft: 8,
-    color: "#558B2F",
+    color: Palette.textSecondary,
     fontSize: 13,
     lineHeight: 18,
   },

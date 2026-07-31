@@ -9,13 +9,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "../contexts/AuthContext";
 import { Transaction, TransactionStatus } from "../models/Transaction";
 import { useTransactionHistoryViewModel } from "../viewmodels/useTransactionHistoryViewModel";
+import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
 
 export default function TransactionHistory() {
   const vm = useTransactionHistoryViewModel();
+  const insets = useSafeAreaInsets();
 
   const { userId } = useAuth();
 
@@ -68,32 +71,32 @@ export default function TransactionHistory() {
   function getStatusColor(status: string) {
     switch (status) {
       case "FINALIZADA":
-        return "#2E7D32";
+        return Palette.primaryDark;
 
       case "CANCELADA":
-        return "#D32F2F";
+        return Palette.danger;
 
       case "PENDENTE":
-        return "#F9A825";
+        return Palette.warning;
 
       default:
-        return "#777";
+        return Palette.textFaint;
     }
   }
 
   function getStatusBg(status: string) {
     switch (status) {
       case "FINALIZADA":
-        return "#E8F5E9";
+        return Palette.successBg;
 
       case "CANCELADA":
-        return "#FDECEA";
+        return Palette.dangerBg;
 
       case "PENDENTE":
-        return "#FFF8E1";
+        return Palette.warningBg;
 
       default:
-        return "#F0F0F0";
+        return Palette.neutralBg;
     }
   }
 
@@ -115,44 +118,57 @@ export default function TransactionHistory() {
 
   if (vm.loading) {
     return (
-      <LinearGradient
-        colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-        style={styles.loadingContainer}
-      >
-        <ActivityIndicator size="large" color="#2E7D32" />
-      </LinearGradient>
+      <View style={styles.screen}>
+        <LinearGradient
+          colors={[Palette.primary, Palette.secondary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
+        >
+          <Text style={styles.title}>Histórico</Text>
+        </LinearGradient>
+
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color={Palette.secondary} />
+        </View>
+      </View>
     );
   }
 
   return (
-    <LinearGradient
-      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-      style={styles.container}
-    >
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Feather name="arrow-left" size={22} color="#2E7D32" />
-        </TouchableOpacity>
+    <View style={styles.screen}>
+      <LinearGradient
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() =>
+              router.canGoBack() ? router.back() : router.replace("/profile")
+            }
+          >
+            <Feather name="arrow-left" size={22} color={Palette.secondary} />
+          </TouchableOpacity>
 
-        <Text style={styles.title}>Histórico</Text>
+          <Text style={styles.title}>Histórico</Text>
 
-        <View style={{ width: 40 }} />
-      </View>
+          <View style={{ width: 40 }} />
+        </View>
+      </LinearGradient>
 
       <FlatList
         data={vm.transactions}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: 120,
-        }}
+        contentContainerStyle={styles.list}
+        removeClippedSubviews={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconCircle}>
-              <Feather name="book-open" size={48} color="#81C784" />
+              <Feather name="book-open" size={48} color={Palette.primaryLight} />
             </View>
 
             <Text style={styles.emptyText}>Nenhuma transação encontrada</Text>
@@ -163,7 +179,7 @@ export default function TransactionHistory() {
             <View style={styles.cardHeader}>
               <View style={styles.cardHeaderLeft}>
                 <View style={styles.iconCircle}>
-                  <Feather name="repeat" size={18} color="#2E7D32" />
+                  <Feather name="repeat" size={18} color={Palette.primaryDark} />
                 </View>
 
                 <Text style={styles.bookTitle} numberOfLines={1}>
@@ -193,85 +209,94 @@ export default function TransactionHistory() {
             <View style={styles.divider} />
 
             <View style={styles.infoRow}>
-              <Feather name="user" size={14} color="#81C784" />
+              <Feather name="user" size={14} color={Palette.primaryLight} />
               <Text style={styles.text}>{getOtherUser(item)}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather name="arrow-right-circle" size={14} color="#81C784" />
+              <Feather name="arrow-right-circle" size={14} color={Palette.primaryLight} />
               <Text style={styles.text}>{getTransactionMessage(item)}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Feather name="calendar" size={14} color="#81C784" />
+              <Feather name="calendar" size={14} color={Palette.primaryLight} />
               <Text style={styles.text}>{formatDate(item.createdAt)}</Text>
             </View>
           </View>
         )}
       />
-    </LinearGradient>
+    </View>
   );
 }
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    padding: 20,
+    backgroundColor: Palette.background,
   },
 
-  loadingContainer: {
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+
+  centerContent: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
   },
 
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-
-    marginTop: 40,
-    marginBottom: 24,
   },
 
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.9)",
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: Palette.overlay,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
   },
 
   title: {
-    fontSize: 24,
+    fontSize: FontSize.lg,
     fontWeight: "700",
-    color: "#2E7D32",
+    color: Palette.white,
   },
 
   card: {
-    backgroundColor: "rgba(255,255,255,0.9)",
-    borderRadius: 24,
+    backgroundColor: Palette.white,
+    borderRadius: Radius.xl,
     borderWidth: 2,
-    borderColor: "#C8E6C9",
+    borderColor: Palette.borderLight,
     padding: 18,
-    marginBottom: 16,
+    marginBottom: Spacing.md,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
-    elevation: 6,
+    elevation: 3,
+  },
+
+  list: {
+    padding: Spacing.lg,
+    paddingBottom: 30,
   },
 
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: Spacing.md,
   },
 
   cardHeaderLeft: {
@@ -285,7 +310,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#E8F5E9",
+    backgroundColor: Palette.tintLight,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 10,
@@ -294,19 +319,19 @@ const styles = StyleSheet.create({
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 12,
+    borderRadius: Radius.sm,
   },
 
   divider: {
     height: 1,
-    backgroundColor: "#E8F5E9",
-    marginBottom: 12,
+    backgroundColor: Palette.tintLight,
+    marginBottom: Spacing.md,
   },
 
   bookTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
     flexShrink: 1,
   },
 
@@ -317,7 +342,7 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    color: "#555",
+    color: Palette.textSoft,
     marginLeft: 8,
     fontSize: 14,
   },
@@ -331,22 +356,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 80,
-    paddingHorizontal: 24,
+    paddingHorizontal: Spacing.xl,
   },
 
   emptyIconCircle: {
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: "#E8F5E9",
+    backgroundColor: Palette.tintLight,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
 
   emptyText: {
     textAlign: "center",
-    color: "#757575",
+    color: Palette.textLabel,
     fontSize: 16,
   },
 });

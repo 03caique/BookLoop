@@ -12,6 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Palette, Radius, Spacing } from "../constants/theme";
 import { useAuth } from "../contexts/AuthContext";
 import { useChatViewModel } from "../viewmodels/useChatViewModel";
 
@@ -23,47 +25,51 @@ export default function Chat() {
   const { userId } = useAuth();
   const vm = useChatViewModel(Number(receiverId));
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   if (vm.loading && vm.messages.length === 0) {
     return (
-      <LinearGradient
-        colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-        style={styles.loadingContainer}
-      >
-        <ActivityIndicator size="large" color="#2E7D32" />
-      </LinearGradient>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Palette.secondary} />
+      </View>
     );
   }
 
   return (
-    <LinearGradient
-      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-      style={styles.gradient}
-    >
+    <View style={styles.screen}>
       <KeyboardAvoidingView
         style={styles.flexFill}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Ionicons name="chevron-back" size={26} color="#2E7D32" />
-          </TouchableOpacity>
+        <LinearGradient
+          colors={[Palette.primary, Palette.secondary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() =>
+                router.canGoBack() ? router.back() : router.replace("/matches")
+              }
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="chevron-back" size={26} color={Palette.white} />
+            </TouchableOpacity>
 
-          <View style={styles.headerAvatar}>
-            <Text style={styles.headerAvatarText}>
-              {(receiverName?.charAt(0) ?? "?").toUpperCase()}
-            </Text>
-          </View>
+            <View style={styles.headerAvatar}>
+              <Text style={styles.headerAvatarText}>
+                {(receiverName?.charAt(0) ?? "?").toUpperCase()}
+              </Text>
+            </View>
 
-          <View style={styles.headerTextWrapper}>
-            <Text style={styles.headerTitle}>{receiverName ?? "Chat"}</Text>
+            <View style={styles.headerTextWrapper}>
+              <Text style={styles.headerTitle}>{receiverName ?? "Chat"}</Text>
+            </View>
           </View>
-        </View>
+        </LinearGradient>
 
         <View style={styles.container}>
           <FlatList
@@ -105,7 +111,7 @@ export default function Chat() {
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Digite uma mensagem..."
-              placeholderTextColor="#9CBFA1"
+              placeholderTextColor={Palette.chatPlaceholder}
               value={vm.message}
               onChangeText={vm.setMessage}
               style={styles.input}
@@ -121,18 +127,19 @@ export default function Chat() {
               disabled={vm.loading || !vm.message.trim()}
               activeOpacity={0.8}
             >
-              <Feather name="send" size={20} color="#FFF" />
+              <Feather name="send" size={20} color={Palette.white} />
             </TouchableOpacity>
           </View>
         </View>
       </KeyboardAvoidingView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: {
+  screen: {
     flex: 1,
+    backgroundColor: Palette.background,
   },
 
   flexFill: {
@@ -143,22 +150,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: Palette.background,
+  },
+
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 50,
-    paddingBottom: 14,
-    paddingHorizontal: 16,
-    backgroundColor: "#FFFFFF",
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    elevation: 4,
-    shadowColor: "#2E7D32",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
   },
 
   backButton: {
@@ -170,14 +179,14 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "#66BB6A",
+    backgroundColor: Palette.overlay,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
 
   headerAvatarText: {
-    color: "#FFF",
+    color: Palette.secondary,
     fontWeight: "bold",
     fontSize: 17,
   },
@@ -189,24 +198,24 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 17,
     fontWeight: "bold",
-    color: "#2E7D32",
+    color: Palette.white,
   },
 
   headerSubtitle: {
     fontSize: 12,
-    color: "#7CB342",
+    color: Palette.white,
     marginTop: 2,
   },
 
   // Corpo
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
   },
 
   messagesContainer: {
-    paddingTop: 12,
-    paddingBottom: 16,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.md,
   },
 
   messageRow: {
@@ -229,19 +238,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 18,
     elevation: 1,
-    shadowColor: "#2E7D32",
+    shadowColor: Palette.primaryDark,
     shadowOpacity: 0.06,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
   },
 
   sentMessage: {
-    backgroundColor: "#66BB6A",
+    backgroundColor: Palette.primary,
     borderBottomRightRadius: 4,
   },
 
   receivedMessage: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Palette.white,
     borderBottomLeftRadius: 4,
   },
 
@@ -251,11 +260,11 @@ const styles = StyleSheet.create({
   },
 
   sentText: {
-    color: "#FFFFFF",
+    color: Palette.white,
   },
 
   receivedText: {
-    color: "#2E2E2E",
+    color: Palette.textDarkAlt,
   },
 
   // Input
@@ -263,12 +272,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-end",
     borderWidth: 2,
-    borderColor: "#C8E6C9",
-    borderRadius: 24,
-    backgroundColor: "#FFF",
-    paddingHorizontal: 16,
+    borderColor: Palette.borderLight,
+    borderRadius: Radius.lg - 4, // 24
+    backgroundColor: Palette.white,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 6,
-    marginBottom: 16,
+    marginBottom: Spacing.md,
     marginTop: 6,
   },
 
@@ -277,19 +286,19 @@ const styles = StyleSheet.create({
     maxHeight: 100,
     paddingVertical: 10,
     fontSize: 16,
-    color: "#2E7D32",
+    color: Palette.primaryDark,
   },
 
   sendButton: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: "#66BB6A",
+    backgroundColor: Palette.primary,
     justifyContent: "center",
     alignItems: "center",
     marginLeft: 8,
     marginBottom: 4,
-    shadowColor: "#66BB6A",
+    shadowColor: Palette.primary,
     shadowOpacity: 0.35,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
@@ -297,7 +306,7 @@ const styles = StyleSheet.create({
   },
 
   sendButtonDisabled: {
-    backgroundColor: "#A5C6A8",
+    backgroundColor: Palette.sendDisabled,
     shadowOpacity: 0,
   },
 });

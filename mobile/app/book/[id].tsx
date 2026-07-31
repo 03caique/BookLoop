@@ -1,6 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
@@ -15,8 +15,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBookDetailsViewModel } from "../../viewmodels/useBookDetailsViewModel";
 import { useBookRequestViewModel } from "../../viewmodels/useBookRequestViewModel";
+import { Palette, Radius, Spacing, FontSize } from "../../constants/theme";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 const CARD_MARGIN = 20;
@@ -25,6 +27,7 @@ export default function BookDetails() {
   const [currentImage, setCurrentImage] = useState(0);
   const [viewerVisible, setViewerVisible] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const insets = useSafeAreaInsets();
 
   const { requestSent, errorMessage, handleRequestBook } =
     useBookRequestViewModel();
@@ -35,7 +38,7 @@ export default function BookDetails() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#2E7D32" />
+        <ActivityIndicator size="large" color={Palette.secondary} />
       </View>
     );
   }
@@ -56,10 +59,28 @@ export default function BookDetails() {
   };
 
   return (
-    <LinearGradient
-      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-      style={styles.container}
-    >
+    <View style={styles.screen}>
+      <LinearGradient
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() =>
+              router.canGoBack() ? router.back() : router.replace("/books")
+            }
+          >
+            <Feather name="arrow-left" size={26} color={Palette.white} />
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>Detalhes do livro</Text>
+
+          <View style={{ width: 26 }} />
+        </View>
+      </LinearGradient>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -209,7 +230,7 @@ export default function BookDetails() {
             style={styles.closeButton}
             onPress={() => setViewerVisible(false)}
           >
-            <Ionicons name="close" size={30} color="#FFF" />
+            <Ionicons name="close" size={30} color={Palette.white} />
           </TouchableOpacity>
 
           <FlatList
@@ -258,13 +279,38 @@ export default function BookDetails() {
           )}
         </View>
       </Modal>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
+    backgroundColor: Palette.background,
+  },
+
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  headerTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: Palette.white,
   },
 
   scrollContent: {
@@ -275,16 +321,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F1F8E9",
+    backgroundColor: Palette.background,
   },
 
   notFoundText: {
     fontSize: 16,
-    color: "#666",
+    color: Palette.textMutedAlt,
   },
 
   carouselWrapper: {
-    marginTop: 12,
+    marginTop: Spacing.md,
   },
 
   imageSlide: {
@@ -295,17 +341,17 @@ const styles = StyleSheet.create({
   bookImage: {
     width: "100%",
     height: 280,
-    borderRadius: 20,
+    borderRadius: Radius.lg - 8, // 20
   },
 
   imagePlaceholder: {
-    backgroundColor: "#DCEDC8",
+    backgroundColor: Palette.imagePlaceholderBg,
     justifyContent: "center",
     alignItems: "center",
   },
 
   placeholderText: {
-    color: "#66BB6A",
+    color: Palette.primary,
     fontSize: 14,
     fontWeight: "600",
   },
@@ -313,30 +359,30 @@ const styles = StyleSheet.create({
   indicators: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 12,
+    marginTop: Spacing.md,
   },
 
   indicator: {
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: "#C8E6C9",
+    backgroundColor: Palette.borderLight,
     marginHorizontal: 3,
   },
 
   activeIndicator: {
-    backgroundColor: "#2E7D32",
+    backgroundColor: Palette.primaryDark,
     width: 18,
   },
 
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: 24,
-    padding: 24,
-    marginTop: 20,
+    backgroundColor: Palette.white,
+    borderRadius: Radius.xl,
+    padding: Spacing.xl,
+    marginTop: Spacing.lg,
     marginHorizontal: CARD_MARGIN,
     elevation: 4,
-    shadowColor: "#2E7D32",
+    shadowColor: Palette.primaryDark,
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
@@ -352,13 +398,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 24,
     fontWeight: "bold",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
     marginRight: 12,
   },
 
   author: {
     fontSize: 15,
-    color: "#7CB342",
+    color: Palette.authorAccent,
     fontWeight: "600",
     marginTop: 4,
   },
@@ -366,37 +412,37 @@ const styles = StyleSheet.create({
   badge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: Radius.full,
   },
 
   badgeDoacao: {
-    backgroundColor: "#C8E6C9",
+    backgroundColor: Palette.badgeDoacaoBg,
   },
 
   badgeTroca: {
-    backgroundColor: "#DCEDC8",
+    backgroundColor: Palette.badgeTrocaBg,
   },
 
   badgeText: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
   },
 
   divider: {
     height: 1,
-    backgroundColor: "#E0E0E0",
-    marginVertical: 20,
+    backgroundColor: Palette.border,
+    marginVertical: Spacing.lg,
   },
 
   infoBlock: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
 
   label: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#66BB6A",
+    color: Palette.primary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 4,
@@ -404,7 +450,7 @@ const styles = StyleSheet.create({
 
   text: {
     fontSize: 16,
-    color: "#333",
+    color: Palette.textBody,
     lineHeight: 24,
   },
 
@@ -412,31 +458,31 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 4,
-    marginBottom: 24,
+    marginBottom: Spacing.xl,
   },
 
   ownerAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#66BB6A",
+    backgroundColor: Palette.primary,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
 
   ownerInitial: {
-    color: "#FFF",
+    color: Palette.white,
     fontWeight: "bold",
     fontSize: 16,
   },
 
   button: {
-    backgroundColor: "#66BB6A",
+    backgroundColor: Palette.primary,
     paddingVertical: 16,
-    borderRadius: 14,
+    borderRadius: Radius.md - 2, // 14
     alignItems: "center",
-    shadowColor: "#66BB6A",
+    shadowColor: Palette.primary,
     shadowOpacity: 0.3,
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 4 },
@@ -444,19 +490,19 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#FFF",
+    color: Palette.white,
     fontSize: 16,
     fontWeight: "bold",
   },
 
   buttonDisabled: {
-    backgroundColor: "#999",
+    backgroundColor: Palette.disabled,
     shadowOpacity: 0,
   },
 
   errorText: {
-    color: "#D32F2F",
-    marginTop: 12,
+    color: Palette.danger,
+    marginTop: Spacing.md,
     textAlign: "center",
     fontWeight: "bold",
   },
@@ -464,16 +510,16 @@ const styles = StyleSheet.create({
   // Visualizador em tela cheia
   viewerContainer: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.95)",
+    backgroundColor: Palette.viewerBg,
     justifyContent: "center",
   },
 
   closeButton: {
     position: "absolute",
     top: 50,
-    right: 20,
+    right: Spacing.lg,
     zIndex: 10,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: Palette.viewerOverlay,
     borderRadius: 20,
     padding: 6,
   },
@@ -502,12 +548,12 @@ const styles = StyleSheet.create({
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: "rgba(255,255,255,0.4)",
+    backgroundColor: Palette.viewerDotInactive,
     marginHorizontal: 3,
   },
 
   viewerIndicatorActive: {
-    backgroundColor: "#FFF",
+    backgroundColor: Palette.white,
     width: 18,
   },
 });

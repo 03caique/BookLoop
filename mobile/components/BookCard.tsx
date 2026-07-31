@@ -105,7 +105,7 @@ export function BookCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "rgba(255,255,255,0.9)",
+    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     borderWidth: 2,
     borderColor: "#C8E6C9",
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
-    elevation: 4,
+    elevation: 3,
   },
 
   image: {
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 16,
-    backgroundColor: "#E8F5E9",
+    backgroundColor: "#F1F8F2",
     justifyContent: "center",
     alignItems: "center",
   },

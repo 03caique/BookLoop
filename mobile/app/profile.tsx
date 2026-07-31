@@ -12,13 +12,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BookCard } from "../components/BookCard";
 import { BottomNavigation } from "../components/BottomNavigation";
+import { FontSize, Palette, Radius, Spacing } from "../constants/theme";
 import { useAuth } from "../contexts/AuthContext";
 import { useProfileViewModel } from "../viewmodels/useProfileViewModel";
 
 export default function Profile() {
   const { signOut } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const vm = useProfileViewModel();
 
@@ -48,33 +51,37 @@ export default function Profile() {
   if (vm.loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={Palette.secondary} />
       </View>
     );
   }
 
   return (
-    <LinearGradient
-      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-      style={styles.container}
-    >
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
+    <View style={styles.screen}>
+      <LinearGradient
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()}>
-            <Feather name="arrow-left" size={30} color="#2E7D32" />
+            <Feather name="arrow-left" size={26} color={Palette.white} />
           </TouchableOpacity>
 
           <Text style={styles.title}>Meu Perfil</Text>
 
-          <View style={{ width: 30 }} />
+          <View style={{ width: 26 }} />
         </View>
+      </LinearGradient>
 
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.profileSection}>
           <View style={styles.avatar}>
-            <Feather name="user" size={70} color="#2E7D32" />
+            <Feather name="user" size={70} color={Palette.primaryDark} />
           </View>
 
           {vm.editing ? (
@@ -120,12 +127,16 @@ export default function Profile() {
               onPress={() => vm.setEditing(true)}
             >
               <View style={styles.menuLeft}>
-                <Feather name="edit-2" size={22} color="#2E7D32" />
+                <Feather name="edit-2" size={22} color={Palette.primaryDark} />
 
                 <Text style={styles.menuText}>Editar Perfil</Text>
               </View>
 
-              <Feather name="chevron-right" size={22} color="#999" />
+              <Feather
+                name="chevron-right"
+                size={22}
+                color={Palette.disabled}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -133,12 +144,20 @@ export default function Profile() {
               onPress={() => router.push("/socioeconomic-profile")}
             >
               <View style={styles.menuLeft}>
-                <Feather name="bar-chart-2" size={22} color="#2E7D32" />
+                <Feather
+                  name="bar-chart-2"
+                  size={22}
+                  color={Palette.primaryDark}
+                />
 
                 <Text style={styles.menuText}>Perfil Socioeconômico</Text>
               </View>
 
-              <Feather name="chevron-right" size={22} color="#999" />
+              <Feather
+                name="chevron-right"
+                size={22}
+                color={Palette.disabled}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -146,12 +165,33 @@ export default function Profile() {
               onPress={() => router.push("/my-requests")}
             >
               <View style={styles.menuLeft}>
-                <Feather name="repeat" size={22} color="#2E7D32" />
+                <Feather name="repeat" size={22} color={Palette.primaryDark} />
 
                 <Text style={styles.menuText}>Minhas solicitações</Text>
               </View>
 
-              <Feather name="chevron-right" size={22} color="#999" />
+              <Feather
+                name="chevron-right"
+                size={22}
+                color={Palette.disabled}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => router.push("/book-requests")}
+            >
+              <View style={styles.menuLeft}>
+                <Feather name="inbox" size={22} color={Palette.primaryDark} />
+
+                <Text style={styles.menuText}>Solicitações recebidas</Text>
+              </View>
+
+              <Feather
+                name="chevron-right"
+                size={22}
+                color={Palette.disabled}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -159,18 +199,22 @@ export default function Profile() {
               onPress={() => router.push("/transaction-history")}
             >
               <View style={styles.menuLeft}>
-                <Feather name="clock" size={22} color="#2E7D32" />
+                <Feather name="clock" size={22} color={Palette.primaryDark} />
 
                 <Text style={styles.menuText}>Histórico de transações</Text>
               </View>
 
-              <Feather name="chevron-right" size={22} color="#999" />
+              <Feather
+                name="chevron-right"
+                size={22}
+                color={Palette.disabled}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
               <View style={styles.menuLeft}>
-                <Feather name="log-out" size={22} color="#D32F2F" />
-                <Text style={[styles.menuText, { color: "#D32F2F" }]}>
+                <Feather name="log-out" size={22} color={Palette.danger} />
+                <Text style={[styles.menuText, { color: Palette.danger }]}>
                   Sair
                 </Text>
               </View>
@@ -201,18 +245,42 @@ export default function Profile() {
       </ScrollView>
 
       <BottomNavigation />
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
+    backgroundColor: Palette.background,
+  },
+
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  title: {
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: Palette.white,
   },
 
   content: {
-    padding: 24,
-    paddingTop: 60,
+    padding: Spacing.xl,
     paddingBottom: 140,
   },
 
@@ -220,25 +288,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-
-    marginBottom: 30,
-  },
-
-  title: {
-    fontSize: 32,
-    fontWeight: "700",
-    color: "#2E7D32",
+    backgroundColor: Palette.background,
   },
 
   profileSection: {
     alignItems: "center",
-    marginBottom: 32,
+    marginBottom: Spacing.xl + 8, // 32
+    marginTop: Spacing.md,
   },
 
   avatar: {
@@ -247,39 +303,43 @@ const styles = StyleSheet.create({
 
     borderRadius: 70,
 
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Palette.white,
 
     justifyContent: "center",
     alignItems: "center",
 
     elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
 
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
   },
 
   name: {
     fontSize: 34,
     fontWeight: "700",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
   },
 
   email: {
     fontSize: 15,
-    color: "#777",
+    color: Palette.textFaint,
     marginTop: 6,
   },
 
   editInput: {
     width: "100%",
 
-    backgroundColor: "#FFF",
+    backgroundColor: Palette.white,
 
     borderWidth: 1,
-    borderColor: "#C8E6C9",
+    borderColor: Palette.borderLight,
 
-    borderRadius: 16,
+    borderRadius: Radius.md,
 
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 14,
 
     fontSize: 16,
@@ -288,32 +348,36 @@ const styles = StyleSheet.create({
   },
 
   saveButton: {
-    backgroundColor: "#26A69A",
+    backgroundColor: Palette.secondary,
 
     paddingVertical: 16,
-    paddingHorizontal: 32,
+    paddingHorizontal: Spacing.xl + 8, // 32
 
-    borderRadius: 16,
+    borderRadius: Radius.md,
 
     marginTop: 10,
   },
 
   saveButtonText: {
-    color: "#FFF",
+    color: Palette.white,
     fontWeight: "700",
     fontSize: 16,
   },
 
   menuContainer: {
-    backgroundColor: "#FFF",
+    backgroundColor: Palette.white,
 
-    borderRadius: 24,
+    borderRadius: Radius.xl,
 
     overflow: "hidden",
 
     elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
 
-    marginBottom: 32,
+    marginBottom: Spacing.xl + 8, // 32
   },
 
   menuItem: {
@@ -321,11 +385,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
 
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.lg,
 
     borderBottomWidth: 1,
-    borderBottomColor: "#EEE",
+    borderBottomColor: Palette.menuBorder,
   },
 
   menuLeft: {
@@ -335,15 +399,15 @@ const styles = StyleSheet.create({
 
   menuText: {
     fontSize: 18,
-    marginLeft: 16,
-    color: "#222",
+    marginLeft: Spacing.md,
+    color: Palette.textDark,
   },
 
   booksTitle: {
     fontSize: 28,
     fontWeight: "700",
-    color: "#2E7D32",
+    color: Palette.primaryDark,
 
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
   },
 });

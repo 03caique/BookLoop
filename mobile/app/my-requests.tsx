@@ -5,134 +5,176 @@ import React from "react";
 import {
   ActivityIndicator,
   FlatList,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BookRequestStatus } from "../models/BookRequest";
 import { useMyRequestsViewModel } from "../viewmodels/useMyRequestsViewModel";
+import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
 
 export default function MyRequestsScreen() {
   const vm = useMyRequestsViewModel();
+  const insets = useSafeAreaInsets();
 
   const renderStatusColor = (status: BookRequestStatus) => {
     switch (status) {
       case "ACEITA":
-        return "#2E7D32";
+        return Palette.primaryDark;
       case "RECUSADA":
-        return "#D32F2F";
+        return Palette.danger;
       case "CANCELADA":
-        return "#757575";
+        return Palette.textLabel;
       default:
-        return "#F9A825";
+        return Palette.warning;
     }
   };
 
   if (vm.loading) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.screen}>
         <LinearGradient
-          colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-          style={styles.container}
+          colors={[Palette.primary, Palette.secondary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
         >
-          <ActivityIndicator size="large" color="#2E7D32" />
+          <Text style={styles.title}>Minhas solicitações</Text>
         </LinearGradient>
-      </SafeAreaView>
+
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color={Palette.secondary} />
+        </View>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={styles.screen}>
       <LinearGradient
-        colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-        style={styles.container}
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Feather name="arrow-left" size={24} color="#2E7D32" />
+          <TouchableOpacity
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace("/profile");
+              }
+            }}
+          >
+            <Feather name="arrow-left" size={26} color={Palette.white} />
           </TouchableOpacity>
 
           <Text style={styles.title}>Minhas solicitações</Text>
 
-          <View style={{ width: 24 }} />
+          <View style={{ width: 26 }} />
         </View>
-
-        <FlatList
-          data={vm.requests}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingBottom: 30 }}
-          ListEmptyComponent={
-            <Text style={styles.empty}>
-              Você ainda não realizou nenhuma solicitação.
-            </Text>
-          }
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <View style={styles.row}>
-                <Feather name="book-open" size={22} color="#2E7D32" />
-
-                <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={styles.book}>{item.bookTitle}</Text>
-
-                  <Text
-                    style={[
-                      styles.status,
-                      { color: renderStatusColor(item.status) },
-                    ]}
-                  >
-                    {item.status}
-                  </Text>
-                </View>
-              </View>
-
-              {item.status === "PENDENTE" && (
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => vm.handleCancel(item.id)}
-                >
-                  <Feather name="x-circle" size={18} color="#FFF" />
-
-                  <Text style={styles.buttonText}>
-                    Cancelar solicitação
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-        />
       </LinearGradient>
-    </SafeAreaView>
+
+      <FlatList
+        data={vm.requests}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.list}
+        removeClippedSubviews={false}
+        ListEmptyComponent={
+          <Text style={styles.empty}>
+            Você ainda não realizou nenhuma solicitação.
+          </Text>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.row}>
+              <Feather name="book-open" size={22} color={Palette.primaryDark} />
+
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={styles.book}>{item.bookTitle}</Text>
+
+                <Text
+                  style={[
+                    styles.status,
+                    { color: renderStatusColor(item.status) },
+                  ]}
+                >
+                  {item.status}
+                </Text>
+              </View>
+            </View>
+
+            {item.status === "PENDENTE" && (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => vm.handleCancel(item.id)}
+              >
+                <Feather name="x-circle" size={18} color={Palette.white} />
+
+                <Text style={styles.buttonText}>Cancelar solicitação</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    backgroundColor: Palette.background,
+  },
+
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
 
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 25,
   },
 
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2E7D32",
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: Palette.white,
+  },
+
+  centerContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: 24,
+    backgroundColor: Palette.white,
+    borderRadius: Radius.xl,
     elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     padding: 18,
     marginBottom: 18,
+  },
+
+  list: {
+    padding: Spacing.lg,
+    paddingBottom: 30,
   },
 
   row: {
@@ -143,7 +185,7 @@ const styles = StyleSheet.create({
   book: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: Palette.textBody,
   },
 
   status: {
@@ -152,9 +194,9 @@ const styles = StyleSheet.create({
   },
 
   cancelButton: {
-    marginTop: 20,
-    backgroundColor: "#D32F2F",
-    borderRadius: 16,
+    marginTop: Spacing.lg,
+    backgroundColor: Palette.danger,
+    borderRadius: Radius.md,
     paddingVertical: 12,
     flexDirection: "row",
     justifyContent: "center",
@@ -162,7 +204,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#FFF",
+    color: Palette.white,
     fontWeight: "bold",
     marginLeft: 8,
   },
@@ -170,7 +212,7 @@ const styles = StyleSheet.create({
   empty: {
     textAlign: "center",
     marginTop: 50,
-    color: "#666",
+    color: Palette.textMutedAlt,
     fontSize: 16,
   },
 });

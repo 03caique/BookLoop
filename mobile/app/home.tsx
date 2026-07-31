@@ -16,9 +16,12 @@ import { BookCard } from "../components/BookCard";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { useBooksViewModel } from "../viewmodels/useBooksViewModel";
 import { useNotificationViewModel } from "../viewmodels/useNotificationViewModel";
+import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Home() {
   const insets = useSafeAreaInsets();
+  const { authenticated } = useAuth();
 
   useEffect(() => {
     NavigationBar.setBackgroundColorAsync("#000000");
@@ -29,12 +32,17 @@ export default function Home() {
   const notificationVm = useNotificationViewModel();
 
   useEffect(() => {
+    if (!authenticated) {
+      notificationVm.stopPolling();
+      return;
+    }
+
     notificationVm.startPolling();
 
     return () => {
       notificationVm.stopPolling();
     };
-  }, []);
+  }, [authenticated]);
 
   if (vm.loading) {
     return (
@@ -47,10 +55,10 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={["#66BB6A", "#26A69A"]}
+        colors={[Palette.primary, Palette.secondary]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={[styles.appBar, { paddingTop: insets.top + 16 }]}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
       >
         <View style={styles.appBarTopRow}>
           <Text style={styles.logo}>BookLoop</Text>
@@ -61,7 +69,7 @@ export default function Home() {
                 onPress={() => router.push("/notifications")}
                 style={styles.iconButton}
               >
-                <Feather name="bell" size={22} color="#FFFFFF" />
+                <Feather name="bell" size={22} color={Palette.secondary} />
               </TouchableOpacity>
 
               {notificationVm.unreadCount > 0 && (
@@ -77,7 +85,7 @@ export default function Home() {
               onPress={() => router.push("/profile")}
               style={styles.iconButton}
             >
-              <Feather name="user" size={22} color="#FFFFFF" />
+              <Feather name="user" size={22} color={Palette.secondary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -137,14 +145,14 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8FAF8",
+    backgroundColor: Palette.background,
   },
 
   appBar: {
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
     elevation: 6,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -156,82 +164,97 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 18,
+    marginBottom: Spacing.lg - 2, // 18
   },
 
   content: {
-    padding: 20,
-    paddingTop: 24,
+    padding: Spacing.lg,
+    paddingTop: Spacing.xl,
     paddingBottom: 140,
   },
 
   logo: {
-    fontSize: 26,
+    fontSize: FontSize.lg,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: Palette.white,
   },
 
   headerIcons: {
     flexDirection: "row",
-    gap: 16,
+    gap: Spacing.md,
   },
 
   iconButton: {
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: "rgba(255,255,255,0.18)",
+    backgroundColor: "rgba(255,255,255,0.95)",
     justifyContent: "center",
     alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
 
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
+    backgroundColor: Palette.white,
+    borderRadius: Radius.md,
     paddingLeft: 14,
-    paddingRight: 6,
+    paddingRight: Spacing.sm - 2, // 6
     height: 50,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
 
   searchIcon: {
-    marginRight: 8,
+    marginRight: Spacing.sm,
   },
 
   searchInput: {
     flex: 1,
-    fontSize: 15,
-    color: "#2E7D32",
+    fontSize: FontSize.sm,
+    color: Palette.primaryDark,
   },
 
   searchButton: {
     width: 38,
     height: 38,
-    borderRadius: 12,
-    backgroundColor: "#26a69a",
+    borderRadius: Radius.sm,
+    backgroundColor: Palette.secondary,
     justifyContent: "center",
     alignItems: "center",
   },
 
   sectionTitle: {
-    fontSize: 20,
+    fontSize: FontSize.md,
     fontWeight: "700",
-    color: "#2E7D32",
-    marginBottom: 16,
+    color: Palette.primaryDark,
+    marginBottom: Spacing.md,
   },
 
   viewAllButton: {
     alignSelf: "center",
-    backgroundColor: "#26a69a",
-    paddingHorizontal: 24,
+    backgroundColor: Palette.secondary,
+    paddingHorizontal: Spacing.xl,
     paddingVertical: 12,
-    borderRadius: 16,
+    borderRadius: Radius.md,
     marginTop: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
   },
 
   viewAllText: {
-    color: "#FFF",
+    color: Palette.white,
     fontWeight: "600",
   },
 
@@ -240,37 +263,33 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-
     height: 70,
-
-    backgroundColor: "#FFF",
-
+    backgroundColor: Palette.white,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-
     borderTopWidth: 1,
-    borderTopColor: "#E0E0E0",
+    borderTopColor: Palette.border,
   },
 
   badge: {
     position: "absolute",
     right: -4,
     top: -4,
-    backgroundColor: "#D32F2F",
-    borderRadius: 12,
+    backgroundColor: Palette.danger,
+    borderRadius: Radius.sm,
     minWidth: 18,
     height: 18,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 4,
+    paddingHorizontal: Spacing.xs,
     borderWidth: 1.5,
-    borderColor: "#FFFFFF",
+    borderColor: Palette.white,
   },
 
   badgeText: {
-    color: "#FFF",
-    fontSize: 10,
+    color: Palette.white,
+    fontSize: FontSize.xs,
     fontWeight: "bold",
   },
 });

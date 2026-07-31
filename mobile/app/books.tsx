@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -6,14 +7,18 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BookCard } from "../components/BookCard";
 import { BottomNavigation } from "../components/BottomNavigation";
 import { useBooksViewModel } from "../viewmodels/useBooksViewModel";
+import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
 
 export default function Books() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const { query } = useLocalSearchParams();
 
@@ -22,32 +27,49 @@ export default function Books() {
   );
 
   return (
-    <LinearGradient
-      colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-      style={styles.container}
-    >
-      <Text style={styles.title}>Livros</Text>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
+      >
+        <Text style={styles.title}>Livros Disponíveis</Text>
 
-      <TextInput
-        placeholder="Buscar livro ou autor"
-        value={search}
-        onChangeText={setSearch}
-        style={styles.input}
-      />
+        <View style={styles.searchContainer}>
+          <Feather
+            name="search"
+            size={18}
+            color={Palette.primaryLight}
+            style={styles.searchIcon}
+          />
 
-      <TouchableOpacity style={styles.button} onPress={loadBooks}>
-        <Text style={styles.buttonText}>BUSCAR</Text>
-      </TouchableOpacity>
+          <TextInput
+            placeholder="Buscar livro ou autor"
+            placeholderTextColor={Palette.textMuted}
+            value={search}
+            onChangeText={setSearch}
+            style={styles.searchInput}
+          />
+
+          <TouchableOpacity style={styles.searchButton} onPress={loadBooks}>
+            <Feather name="arrow-right" size={18} color={Palette.white} />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
       {loading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator
+          size="large"
+          color={Palette.secondary}
+          style={styles.loader}
+        />
       ) : (
         <FlatList
           data={books}
           keyExtractor={(item) => item.id!.toString()}
-          contentContainerStyle={{
-            paddingBottom: 120,
-          }}
+          contentContainerStyle={styles.listContent}
+          removeClippedSubviews={false}
           renderItem={({ item }) => (
             <BookCard
               book={item}
@@ -58,42 +80,75 @@ export default function Books() {
       )}
 
       <BottomNavigation />
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: Palette.background,
+  },
+
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#2E7D32",
-    marginBottom: 20,
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: Palette.white,
+    marginBottom: Spacing.md,
   },
 
-  input: {
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#C8E6C9",
-  },
-
-  button: {
-    backgroundColor: "#26a69a",
-    padding: 16,
-    borderRadius: 12,
+  searchContainer: {
+    flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    backgroundColor: Palette.white,
+    borderRadius: Radius.md,
+    paddingLeft: 14,
+    paddingRight: 6,
+    height: 50,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
   },
 
-  buttonText: {
-    color: "#FFF",
-    fontWeight: "bold",
+  searchIcon: {
+    marginRight: Spacing.sm,
+  },
+
+  searchInput: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    color: Palette.primaryDark,
+  },
+
+  searchButton: {
+    width: 38,
+    height: 38,
+    borderRadius: Radius.sm,
+    backgroundColor: Palette.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loader: {
+    marginTop: Spacing.xl,
+  },
+
+  listContent: {
+    padding: Spacing.lg,
+    paddingBottom: 140,
   },
 });

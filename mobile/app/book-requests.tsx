@@ -5,12 +5,13 @@ import React, { useEffect } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FontSize, Palette, Radius, Spacing } from "../constants/theme";
 import { BookRequestStatus, PriorityLevel } from "../models/BookRequest";
 import { useBookRequestViewModel } from "../viewmodels/useBookRequestViewModel";
 import { useNotificationViewModel } from "../viewmodels/useNotificationViewModel";
@@ -18,6 +19,7 @@ import { useNotificationViewModel } from "../viewmodels/useNotificationViewModel
 export default function BookRequestsScreen() {
   const vm = useBookRequestViewModel();
   const notificationVm = useNotificationViewModel();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     notificationVm.markAllAsRead();
@@ -26,11 +28,11 @@ export default function BookRequestsScreen() {
   const renderStatusColor = (status: BookRequestStatus) => {
     switch (status) {
       case "ACEITA":
-        return "#2E7D32";
+        return Palette.primaryDark;
       case "RECUSADA":
-        return "#D32F2F";
+        return Palette.danger;
       default:
-        return "#F9A825";
+        return Palette.warning;
     }
   };
 
@@ -52,181 +54,217 @@ export default function BookRequestsScreen() {
   const getPriorityColors = (priorityLevel: PriorityLevel | null) => {
     if (!priorityLevel) {
       return {
-        background: "#F5F5F5",
-        text: "#757575",
-        icon: "#757575",
+        background: Palette.priorityNeutralBg,
+        text: Palette.priorityNeutralText,
+        icon: Palette.priorityNeutralText,
       };
     }
 
     switch (priorityLevel.toUpperCase()) {
       case "ALTA":
         return {
-          background: "#FFEBEE",
-          text: "#C62828",
-          icon: "#C62828",
+          background: Palette.priorityHighBg,
+          text: Palette.priorityHighText,
+          icon: Palette.priorityHighText,
         };
       case "MEDIA":
         return {
-          background: "#FFF8E1",
-          text: "#F57F17",
-          icon: "#F57F17",
+          background: Palette.priorityMediumBg,
+          text: Palette.priorityMediumText,
+          icon: Palette.priorityMediumText,
         };
       case "BAIXA":
       default:
         return {
-          background: "#E8F5E9",
-          text: "#2E7D32",
-          icon: "#2E7D32",
+          background: Palette.priorityLowBg,
+          text: Palette.priorityLowText,
+          icon: Palette.priorityLowText,
         };
     }
   };
 
   if (vm.loading) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.screen}>
         <LinearGradient
-          colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-          style={styles.container}
+          colors={[Palette.primary, Palette.secondary]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
         >
-          <ActivityIndicator size="large" color="#2E7D32" />
+          <Text style={styles.title}>Solicitações</Text>
         </LinearGradient>
-      </SafeAreaView>
+
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color={Palette.secondary} />
+        </View>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <View style={styles.screen}>
       <LinearGradient
-        colors={["#E8F5E9", "#F1F8E9", "#FFFFFF"]}
-        style={styles.container}
+        colors={[Palette.primary, Palette.secondary]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Feather name="arrow-left" size={24} color="#2E7D32" />
+          <TouchableOpacity
+            onPress={() =>
+              router.canGoBack() ? router.back() : router.replace("/")
+            }
+          >
+            <Feather name="arrow-left" size={26} color={Palette.white} />
           </TouchableOpacity>
 
           <Text style={styles.title}>Solicitações</Text>
 
-          <View style={{ width: 24 }} />
+          <View style={{ width: 26 }} />
         </View>
+      </LinearGradient>
 
-        <FlatList
-          data={vm.requests}
-          keyExtractor={(item) => item.id.toString()}
-          contentContainerStyle={{ paddingBottom: 30 }}
-          ListEmptyComponent={
-            <Text style={styles.empty}>Nenhuma solicitação encontrada.</Text>
-          }
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <View style={styles.row}>
-                <Feather name="book-open" size={22} color="#2E7D32" />
+      <FlatList
+        data={vm.requests}
+        keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={styles.list}
+        removeClippedSubviews={false}
+        ListEmptyComponent={
+          <Text style={styles.empty}>Nenhuma solicitação encontrada.</Text>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.row}>
+              <Feather name="book-open" size={22} color={Palette.primaryDark} />
 
-                <View style={{ flex: 1, marginLeft: 12 }}>
-                  <Text style={styles.book}>{item.bookTitle}</Text>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={styles.book}>{item.bookTitle}</Text>
 
-                  <Text style={styles.user}>
-                    Solicitado por: {item.requesterName}
-                  </Text>
+                <Text style={styles.user}>
+                  Solicitado por: {item.requesterName}
+                </Text>
 
-                  {item.hasSocioeconomicProfile && (
-                    <View style={styles.priorityContainer}>
-                      <View
+                {item.hasSocioeconomicProfile && (
+                  <View style={styles.priorityContainer}>
+                    <View
+                      style={[
+                        styles.priorityBadge,
+                        {
+                          backgroundColor: getPriorityColors(item.priorityLevel)
+                            .background,
+                        },
+                      ]}
+                    >
+                      <Feather
+                        name="star"
+                        size={15}
+                        color={getPriorityColors(item.priorityLevel).icon}
+                      />
+
+                      <Text
                         style={[
-                          styles.priorityBadge,
+                          styles.priorityText,
                           {
-                            backgroundColor: getPriorityColors(
-                              item.priorityLevel,
-                            ).background,
+                            color: getPriorityColors(item.priorityLevel).text,
                           },
                         ]}
                       >
-                        <Feather
-                          name="star"
-                          size={15}
-                          color={getPriorityColors(item.priorityLevel).icon}
-                        />
-
-                        <Text
-                          style={[
-                            styles.priorityText,
-                            {
-                              color: getPriorityColors(item.priorityLevel).text,
-                            },
-                          ]}
-                        >
-                          {renderPriorityLevel(item.priorityLevel)}
-                        </Text>
-                      </View>
+                        {renderPriorityLevel(item.priorityLevel)}
+                      </Text>
                     </View>
-                  )}
+                  </View>
+                )}
 
-                  <Text
-                    style={[
-                      styles.status,
-                      { color: renderStatusColor(item.status) },
-                    ]}
-                  >
-                    {item.status}
-                  </Text>
-                </View>
+                <Text
+                  style={[
+                    styles.status,
+                    { color: renderStatusColor(item.status) },
+                  ]}
+                >
+                  {item.status}
+                </Text>
               </View>
-
-              {item.status === "PENDENTE" && (
-                <View style={styles.buttons}>
-                  <TouchableOpacity
-                    onPress={() => vm.handleReject(item.id)}
-                    style={styles.rejectButton}
-                  >
-                    <Feather name="x-circle" size={18} color="#FFF" />
-
-                    <Text style={styles.buttonText}>Recusar</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity onPress={() => vm.handleAccept(item.id)}>
-                    <LinearGradient
-                      colors={["#2E7D32", "#43A047"]}
-                      style={styles.acceptButton}
-                    >
-                      <Feather name="check-circle" size={18} color="#FFF" />
-
-                      <Text style={styles.buttonText}>Aceitar</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              )}
             </View>
-          )}
-        />
-      </LinearGradient>
-    </SafeAreaView>
+
+            {item.status === "PENDENTE" && (
+              <View style={styles.buttons}>
+                <TouchableOpacity
+                  onPress={() => vm.handleReject(item.id)}
+                  style={styles.rejectButton}
+                >
+                  <Feather name="x-circle" size={18} color={Palette.white} />
+
+                  <Text style={styles.buttonText}>Recusar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => vm.handleAccept(item.id)}>
+                  <LinearGradient
+                    colors={[Palette.primaryDark, Palette.acceptAccent]}
+                    style={styles.acceptButton}
+                  >
+                    <Feather
+                      name="check-circle"
+                      size={18}
+                      color={Palette.white}
+                    />
+
+                    <Text style={styles.buttonText}>Aceitar</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        )}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    backgroundColor: Palette.background,
+  },
+
+  appBar: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderBottomLeftRadius: Radius.lg,
+    borderBottomRightRadius: Radius.lg,
+    elevation: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+  },
+
+  centerContent: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 25,
   },
 
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#2E7D32",
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: Palette.white,
   },
 
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: 24,
+    backgroundColor: Palette.white,
+    borderRadius: Radius.xl,
     elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
     padding: 18,
     marginBottom: 18,
   },
@@ -239,12 +277,12 @@ const styles = StyleSheet.create({
   book: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: Palette.textBody,
   },
 
   user: {
     marginTop: 4,
-    color: "#666",
+    color: Palette.textMutedAlt,
     fontSize: 15,
   },
 
@@ -256,7 +294,7 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: Spacing.lg,
   },
 
   acceptButton: {
@@ -264,20 +302,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 18,
     paddingVertical: 12,
-    borderRadius: 16,
+    borderRadius: Radius.md,
   },
 
   rejectButton: {
-    backgroundColor: "#D32F2F",
+    backgroundColor: Palette.danger,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 18,
     paddingVertical: 12,
-    borderRadius: 16,
+    borderRadius: Radius.md,
   },
 
   buttonText: {
-    color: "#FFF",
+    color: Palette.white,
     fontWeight: "bold",
     marginLeft: 8,
   },
@@ -285,7 +323,7 @@ const styles = StyleSheet.create({
   empty: {
     textAlign: "center",
     marginTop: 50,
-    color: "#666",
+    color: Palette.textMutedAlt,
     fontSize: 16,
   },
 
@@ -299,12 +337,17 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: Radius.sm,
   },
 
   priorityText: {
     marginLeft: 5,
     fontSize: 13,
     fontWeight: "600",
+  },
+
+  list: {
+    padding: Spacing.lg,
+    paddingBottom: 30,
   },
 });

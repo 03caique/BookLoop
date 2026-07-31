@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
 
 export default function Home() {
 
@@ -16,9 +17,9 @@ export default function Home() {
 
     <LinearGradient
       colors={[
-        "#E8F5E9",
-        "#F1F8E9",
-        "#FFFFFF"
+        Palette.gradientStart,
+        Palette.gradientMid,
+        Palette.white,
       ]}
       style={styles.gradient}
     >
@@ -30,7 +31,7 @@ export default function Home() {
           <Feather
             name="book-open"
             size={70}
-            color="#2E7D32"
+            color={Palette.primaryDark}
           />
 
           <Text style={styles.title}>
@@ -58,8 +59,8 @@ export default function Home() {
 
             <LinearGradient
               colors={[
-                "#66BB6A",
-                "#26A69A"
+                Palette.primary,
+                Palette.secondary,
               ]}
               style={styles.buttonGradient}
             >
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "space-between",
-    padding: 32,
+    padding: Spacing.xl + 8, // 32
   },
 
   logoContainer: {
@@ -122,13 +123,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 42,
     fontWeight: "700",
-    color: "#2E7D32",
-    marginTop: 16,
+    color: Palette.primaryDark,
+    marginTop: Spacing.md,
   },
 
   subtitle: {
     fontSize: 18,
-    color: "#66BB6A",
+    color: Palette.primary,
     marginTop: 4,
   },
 
@@ -137,9 +138,9 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    borderRadius: 16,
+    borderRadius: Radius.md,
     overflow: "hidden",
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
 
   buttonGradient: {
@@ -148,21 +149,21 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#FFF",
+    color: Palette.white,
     fontSize: 16,
     fontWeight: "700",
   },
 
   outlineButton: {
     borderWidth: 2,
-    borderColor: "#66BB6A",
-    borderRadius: 16,
+    borderColor: Palette.primary,
+    borderRadius: Radius.md,
     paddingVertical: 18,
     alignItems: "center",
   },
 
   outlineButtonText: {
-    color: "#66BB6A",
+    color: Palette.primary,
     fontSize: 16,
     fontWeight: "700",
   },
@@ -173,8 +174,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
 
-    backgroundColor:
-      "rgba(38, 166, 154, 0.12)",
+    backgroundColor: Palette.blobSecondary,
 
     top: -40,
     right: -60,
@@ -196,8 +196,7 @@ const styles = StyleSheet.create({
 
     borderWidth: 2,
 
-    borderColor:
-      "rgba(38, 166, 154, 0.45)",
+    borderColor: Palette.blobSecondaryOutline,
 
     top: -48,
     right: -52,
@@ -219,8 +218,7 @@ const styles = StyleSheet.create({
     width: 260,
     height: 260,
 
-    backgroundColor:
-      "rgba(102, 187, 106, 0.18)",
+    backgroundColor: Palette.blobPrimary,
 
     bottom: -80,
     left: -90,
@@ -245,8 +243,7 @@ const styles = StyleSheet.create({
 
     borderWidth: 2,
 
-    borderColor:
-      "rgba(46, 125, 50, 0.5)",
+    borderColor: Palette.blobPrimaryOutline,
 
     bottom: -70,
     left: -80,

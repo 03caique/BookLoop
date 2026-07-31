@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { useLoginViewModel } from '../viewmodels/useLoginViewModel';
+import { Palette, Radius, Spacing, FontSize } from '../constants/theme';
 
 export default function Login() {
 
@@ -20,7 +21,7 @@ export default function Login() {
 
   return (
     <LinearGradient
-      colors={['#E8F5E9', '#F1F8E9', '#FFFFFF']}
+      colors={[Palette.gradientStart, Palette.gradientMid, Palette.white]}
       style={styles.gradient}
     >
       <View style={styles.container}>
@@ -32,7 +33,7 @@ export default function Login() {
           <Feather
             name="arrow-left"
             size={24}
-            color="#2E7D32"
+            color={Palette.primaryDark}
           />
         </TouchableOpacity>
 
@@ -49,13 +50,13 @@ export default function Login() {
             <Feather
               name="mail"
               size={20}
-              color="#81C784"
+              color={Palette.primaryLight}
               style={styles.icon}
             />
 
             <TextInput
               placeholder="E-mail"
-              placeholderTextColor="#A5D6A7"
+              placeholderTextColor={Palette.placeholder}
               value={vm.email}
               onChangeText={vm.setEmail}
               keyboardType="email-address"
@@ -71,13 +72,13 @@ export default function Login() {
             <Feather
               name="lock"
               size={20}
-              color="#81C784"
+              color={Palette.primaryLight}
               style={styles.icon}
             />
 
             <TextInput
               placeholder="Senha"
-              placeholderTextColor="#A5D6A7"
+              placeholderTextColor={Palette.placeholder}
               value={vm.password}
               onChangeText={vm.setPassword}
               secureTextEntry={!vm.showPassword}
@@ -100,7 +101,7 @@ export default function Login() {
                     : "eye"
                 }
                 size={20}
-                color="#81C784"
+                color={Palette.primaryLight}
               />
 
             </TouchableOpacity>
@@ -120,8 +121,8 @@ export default function Login() {
             <LinearGradient
               colors={
                 vm.loading
-                  ? ['#999', '#999']
-                  : ['#66BB6A', '#26A69A']
+                  ? [Palette.disabled, Palette.disabled]
+                  : [Palette.primary, Palette.secondary]
               }
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -180,7 +181,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    padding: 24,
+    padding: Spacing.xl,
     justifyContent: 'center',
   },
 
@@ -192,8 +193,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#2E7D32',
-    marginBottom: 8,
+    color: Palette.primaryDark,
+    marginBottom: Spacing.sm,
 
     zIndex: 10,
     elevation: 10,
@@ -201,17 +202,16 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: 16,
-    color: '#66BB6A',
+    color: Palette.primary,
     textAlign: 'center',
   },
 
   formContainer: {
-    backgroundColor:
-      'rgba(255, 255, 255, 0.9)',
+    backgroundColor: Palette.formBackground,
 
-    borderRadius: 24,
+    borderRadius: Radius.xl,
 
-    padding: 24,
+    padding: Spacing.xl,
 
     shadowColor: '#000',
 
@@ -232,16 +232,16 @@ const styles = StyleSheet.create({
 
     alignItems: 'center',
 
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Palette.white,
 
     borderWidth: 2,
-    borderColor: '#C8E6C9',
+    borderColor: Palette.borderLight,
 
-    borderRadius: 16,
+    borderRadius: Radius.md,
 
-    marginBottom: 16,
+    marginBottom: Spacing.md,
 
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
 
     height: 56,
   },
@@ -253,21 +253,21 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#2E7D32',
+    color: Palette.primaryDark,
   },
 
   showPassword: {
     fontSize: 14,
-    color: '#81C784',
+    color: Palette.primaryLight,
     fontWeight: '500',
   },
 
   button: {
-    borderRadius: 16,
+    borderRadius: Radius.md,
     overflow: 'hidden',
 
     marginTop: 8,
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
 
   buttonDisabled: {
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: '#FFFFFF',
+    color: Palette.white,
     fontSize: 16,
     fontWeight: '700',
     letterSpacing: 1,
@@ -288,9 +288,9 @@ const styles = StyleSheet.create({
 
   terms: {
     fontSize: 12,
-    color: '#81C784',
+    color: Palette.primaryLight,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: Spacing.xl,
     lineHeight: 18,
   },
 
@@ -302,12 +302,12 @@ const styles = StyleSheet.create({
 
   footerText: {
     fontSize: 14,
-    color: '#66BB6A',
+    color: Palette.primary,
   },
 
   footerLink: {
     fontSize: 14,
-    color: '#26A69A',
+    color: Palette.secondary,
     fontWeight: '600',
   },
 
@@ -317,8 +317,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
 
-    backgroundColor:
-      "rgba(38, 166, 154, 0.12)",
+    backgroundColor: Palette.blobSecondary,
 
     top: -40,
     right: -60,
@@ -340,8 +339,7 @@ const styles = StyleSheet.create({
 
     borderWidth: 2,
 
-    borderColor:
-      "rgba(38, 166, 154, 0.45)",
+    borderColor: Palette.blobSecondaryOutline,
 
     top: -48,
     right: -52,
@@ -363,8 +361,7 @@ const styles = StyleSheet.create({
     width: 260,
     height: 260,
 
-    backgroundColor:
-      "rgba(102, 187, 106, 0.18)",
+    backgroundColor: Palette.blobPrimary,
 
     bottom: -80,
     left: -90,
@@ -389,8 +386,7 @@ const styles = StyleSheet.create({
 
     borderWidth: 2,
 
-    borderColor:
-      "rgba(46, 125, 50, 0.5)",
+    borderColor: Palette.blobPrimaryOutline,
 
     bottom: -70,
     left: -80,
@@ -414,14 +410,14 @@ const styles = StyleSheet.create({
 
     top: 60,
 
-    left: 24,
+    left: Spacing.xl,
 
     width: 44,
     height: 44,
 
     borderRadius: 22,
 
-    backgroundColor: "rgba(255,255,255,0.8)",
+    backgroundColor: Palette.backButtonBackground,
 
     justifyContent: "center",
     alignItems: "center",
