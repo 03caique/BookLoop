@@ -40,16 +40,17 @@ export async function uploadBookPhoto(
 }
 
 export async function getBooks(
-  search = ""
+  search: string = "",
+  size: number = 10,
+  page: number = 0
 ) {
-  const response = await api.get(
-    "/api/books",
-    {
-      params: {
-        search,
-      },
-    }
-  );
+  const response = await api.get("/api/books", {
+    params: {
+      search,
+      size,
+      page,
+    },
+  });
 
   return response.data;
 }

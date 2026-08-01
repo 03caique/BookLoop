@@ -28,7 +28,7 @@ export default function Home() {
     NavigationBar.setButtonStyleAsync("light");
   }, []);
 
-  const vm = useBooksViewModel();
+  const vm = useBooksViewModel("", 5);
   const notificationVm = useNotificationViewModel();
 
   useEffect(() => {
@@ -121,7 +121,7 @@ export default function Home() {
       >
         <Text style={styles.sectionTitle}>Livros Recentes</Text>
 
-        {vm.books.slice(0, 5).map((book) => (
+        {vm.books.map((book) => (
           <BookCard
             key={book.id}
             book={book}

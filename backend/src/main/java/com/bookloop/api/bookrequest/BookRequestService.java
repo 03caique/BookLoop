@@ -2,6 +2,7 @@ package com.bookloop.api.bookrequest;
 
 import com.bookloop.api.book.Book;
 import com.bookloop.api.book.BookRepository;
+import com.bookloop.api.book.BookStatus;
 import com.bookloop.api.bookrequest.dto.BookRequestRequestDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestResponseDTO;
 import com.bookloop.api.bookrequest.dto.BookRequestUpdateDTO;
@@ -10,6 +11,7 @@ import com.bookloop.api.notification.NotificationService;
 import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.socioeconomicprofile.SocioeconomicProfile;
 import com.bookloop.api.socioeconomicprofile.SocioeconomicProfileRepository;
+import com.bookloop.api.transaction.TransactionService;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -37,6 +39,7 @@ public class BookRequestService {
     private final LoggedUserService loggedUserService;
     private final NotificationService notificationService;
     private final SocioeconomicProfileRepository socioeconomicProfileRepository;
+    private final TransactionService transactionService;
 
     public BookRequestResponseDTO create(BookRequestRequestDTO dto) {
 
@@ -149,7 +152,12 @@ public class BookRequestService {
 
         if (updatedRequest.getStatus() == BookRequestStatus.ACEITA) {
             notificationService.createRequestAcceptedNotification(updatedRequest);
-            matchService.checkForMatch(updatedRequest);
+
+            if (updatedRequest.getBook().getStatus() == BookStatus.TROCA) {
+                matchService.checkForMatch(updatedRequest);
+            } else {
+                transactionService.createDonationTransaction(updatedRequest);
+            }
         }
 
         BookRequestResponseDTO responseDTO = modelMapper.map(updatedRequest, BookRequestResponseDTO.class);

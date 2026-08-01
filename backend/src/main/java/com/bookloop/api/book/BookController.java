@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,7 @@ public class BookController {
     @ResponseStatus(HttpStatus.OK)
     public Page<BookResponseDTO> findByFilter(
             @RequestParam(defaultValue = "")
-            String search,
-            @PageableDefault(size = 10)
+            String search, @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC)
             Pageable pageable
     ) {
         return bookService.findByFilter(

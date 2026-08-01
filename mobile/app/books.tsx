@@ -13,8 +13,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BookCard } from "../components/BookCard";
 import { BottomNavigation } from "../components/BottomNavigation";
+import { FontSize, Palette, Radius, Spacing } from "../constants/theme";
 import { useBooksViewModel } from "../viewmodels/useBooksViewModel";
-import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
 
 export default function Books() {
   const router = useRouter();
@@ -22,9 +22,15 @@ export default function Books() {
 
   const { query } = useLocalSearchParams();
 
-  const { books, search, setSearch, loading, loadBooks } = useBooksViewModel(
-    (query as string) || "",
-  );
+  const {
+    books,
+    search,
+    setSearch,
+    loading,
+    loadingMore,
+    loadBooks,
+    loadMoreBooks,
+  } = useBooksViewModel((query as string) || "");
 
   return (
     <View style={styles.container}>
@@ -76,6 +82,17 @@ export default function Books() {
               onPress={() => router.push(`/book/${item.id}`)}
             />
           )}
+          onEndReached={loadMoreBooks}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <ActivityIndicator
+                size="small"
+                color={Palette.secondary}
+                style={styles.footerLoader}
+              />
+            ) : null
+          }
         />
       )}
 
@@ -150,5 +167,10 @@ const styles = StyleSheet.create({
   listContent: {
     padding: Spacing.lg,
     paddingBottom: 140,
+  },
+
+  footerLoader: {
+    marginTop: Spacing.md,
+    marginBottom: Spacing.md,
   },
 });
