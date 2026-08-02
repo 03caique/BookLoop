@@ -9,7 +9,6 @@ export function useBookRequestViewModel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Estados necessários para refletir na View (BookDetails)
   const [requestSent, setRequestSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -36,7 +35,7 @@ export function useBookRequestViewModel() {
       setLoading(false);
     }
   };
-   
+
   const handleRequestBook = async (bookId: number, ownerId: number) => {
     try {
       setLoading(true);
@@ -45,7 +44,8 @@ export function useBookRequestViewModel() {
       const currentUserIdStr = await AsyncStorage.getItem("userId");
 
       if (!currentUserIdStr) {
-        const authError = "Você precisa estar autenticado para solicitar um livro.";
+        const authError =
+          "Você precisa estar autenticado para solicitar um livro.";
         setErrorMessage(authError);
         Alert.alert("Aviso", authError);
         return;
@@ -62,17 +62,31 @@ export function useBookRequestViewModel() {
 
       const requestData: BookRequest = {
         bookId: bookId,
-        requesterId: requesterId, 
+        requesterId: requesterId,
       };
 
       await bookRequestService.createBookRequest(requestData);
 
       setRequestSent(true);
-      Alert.alert("Sucesso", "Sua solicitação de livro foi enviada com sucesso!");
+      Alert.alert(
+        "Sucesso",
+        "Sua solicitação de livro foi enviada com sucesso!",
+      );
     } catch (err: any) {
+      if (err.response?.status === 409) {
+        const message =
+          err.response?.data?.message ?? "Solicitação já enviada.";
+
+        setErrorMessage(message);
+        Alert.alert("Aviso", message);
+        return;
+      }
+
       console.error("Erro ao solicitar livro:", err);
-      
-      const backendError = err?.response?.data?.message || "Não foi possível enviar a solicitação.";
+
+      const backendError =
+        err.response?.data?.message ?? "Não foi possível enviar a solicitação.";
+
       setErrorMessage(backendError);
       Alert.alert("Erro", backendError);
     } finally {

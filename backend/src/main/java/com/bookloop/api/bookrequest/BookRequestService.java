@@ -153,14 +153,10 @@ public class BookRequestService {
         if (updatedRequest.getStatus() == BookRequestStatus.ACEITA) {
             notificationService.createRequestAcceptedNotification(updatedRequest);
 
-            if (updatedRequest.getStatus() == BookRequestStatus.ACEITA) {
-                notificationService.createRequestAcceptedNotification(updatedRequest);
-
-                if (updatedRequest.getBook().getStatus() == BookStatus.TROCA) {
-                    matchService.checkForMatch(updatedRequest);
-                } else {
-                    transactionService.createDonationTransaction(updatedRequest);
-                }
+            if (updatedRequest.getBook().getStatus() == BookStatus.TROCA) {
+                matchService.checkForMatch(updatedRequest);
+            } else {
+                transactionService.createDonationTransaction(updatedRequest);
             }
         }
 

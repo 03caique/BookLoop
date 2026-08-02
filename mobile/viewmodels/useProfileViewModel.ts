@@ -12,6 +12,8 @@ export function useProfileViewModel() {
 
   const [email, setEmail] = useState("");
 
+  const [originalEmail, setOriginalEmail] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   const [editing, setEditing] = useState(false);
@@ -30,6 +32,7 @@ export function useProfileViewModel() {
 
       setName(response.name);
       setEmail(response.email);
+      setOriginalEmail(response.email);
     } catch (error) {
       Alert.alert("Erro", "Não foi possível carregar o perfil");
     } finally {
@@ -39,7 +42,7 @@ export function useProfileViewModel() {
 
   async function handleUpdate() {
     if (!userId) {
-      return;
+      return false;
     }
 
     try {
@@ -51,8 +54,12 @@ export function useProfileViewModel() {
       });
 
       Alert.alert("Sucesso", "Perfil atualizado");
+
+      return email !== originalEmail;
     } catch (error) {
       Alert.alert("Erro", "Não foi possível atualizar");
+
+      return false;
     } finally {
       setLoading(false);
     }
@@ -73,42 +80,35 @@ export function useProfileViewModel() {
   }
 
   async function handleDeleteBook(bookId: number) {
-    Alert.alert(
-      "Remover livro",
-      "Tem certeza que deseja remover este livro? Ele não ficará mais disponível, mas seu histórico será preservado.",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
+    Alert.alert("Remover livro", "Tem certeza que deseja remover este livro?", [
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+      {
+        text: "Remover",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setLoading(true);
+
+            await deleteBook(bookId);
+
+            setBooks((currentBooks) =>
+              currentBooks.filter((book) => book.id !== bookId),
+            );
+
+            Alert.alert("Livro removido", "O livro foi removido com sucesso.");
+          } catch (error) {
+            console.error(error);
+
+            Alert.alert("Erro", "Não foi possível remover o livro.");
+          } finally {
+            setLoading(false);
+          }
         },
-        {
-          text: "Remover",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setLoading(true);
-
-              await deleteBook(bookId);
-
-              setBooks((currentBooks) =>
-                currentBooks.filter((book) => book.id !== bookId),
-              );
-
-              Alert.alert(
-                "Livro removido",
-                "O livro foi removido com sucesso.",
-              );
-            } catch (error) {
-              console.error(error);
-
-              Alert.alert("Erro", "Não foi possível remover o livro.");
-            } finally {
-              setLoading(false);
-            }
-          },
-        },
-      ],
-    );
+      },
+    ]);
   }
 
   useEffect(() => {

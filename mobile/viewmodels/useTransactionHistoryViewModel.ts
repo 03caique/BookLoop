@@ -2,7 +2,7 @@ import{ useEffect, useState }from "react";
 import{ Alert }from "react-native";
 import{ useAuth }from "../contexts/AuthContext";
 import{ Transaction }from "../models/Transaction";
-import{ getTransactionByUser }from "../services/transactionService";
+import { transactionService } from "../services/transactionService";
 
 export function useTransactionHistoryViewModel(){
     const{
@@ -17,7 +17,7 @@ export function useTransactionHistoryViewModel(){
         }
         try{
             setLoading(true);
-            const response=await getTransactionByUser(userId);
+            const response = await transactionService.getMyTransactions();
             setTransactions(response);
         } catch (error){
             Alert.alert(

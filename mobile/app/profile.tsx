@@ -103,7 +103,24 @@ export default function Profile() {
               <TouchableOpacity
                 style={styles.saveButton}
                 onPress={async () => {
-                  await vm.handleUpdate();
+                  const emailChanged = await vm.handleUpdate();
+
+                  if (emailChanged) {
+                    await signOut();
+
+                    Alert.alert(
+                      "E-mail alterado",
+                      "Seu e-mail foi alterado. Faça login novamente.",
+                      [
+                        {
+                          text: "OK",
+                          onPress: () => router.replace("/welcome"),
+                        },
+                      ],
+                    );
+
+                    return;
+                  }
 
                   vm.setEditing(false);
                 }}

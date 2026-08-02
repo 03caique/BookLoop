@@ -37,7 +37,7 @@ export function useBookRegisterViewModel() {
 
         setTitle(book.title);
         setAuthor(book.author);
-        setIsbn(book.isbn);
+        setIsbn(book.isbn ?? "");
         setDescription(book.description);
         setStatus(book.status);
         setCondition(book.condition);
@@ -131,12 +131,7 @@ export function useBookRegisterViewModel() {
   }
 
   async function handleUpdateBook() {
-    if (
-      !title.trim() ||
-      !author.trim() ||
-      !isbn.trim() ||
-      !description.trim()
-    ) {
+    if (!title.trim() || !author.trim() || !description.trim()) {
       Alert.alert("Erro", "Preencha todos os campos");
       return;
     }

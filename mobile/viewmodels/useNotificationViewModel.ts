@@ -81,7 +81,7 @@ export function useNotificationViewModel() {
         ) {
           router.push("/book-requests");
         } else if (notification.type === "MATCH_CRIADO") {
-          router.push("/matches");
+          router.push("/transactions");
         } else if (notification.type === "TRANSACAO_FINALIZADA") {
           router.push("/transaction-history");
         }

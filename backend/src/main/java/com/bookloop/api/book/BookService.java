@@ -108,7 +108,7 @@ public class BookService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        List<Book> books = bookRepository.findByUserIdAndStatusNot(id, BookStatus.INATIVO);
+        List<Book> books = bookRepository.findByUserIdAndStatusIn(id, List.of(BookStatus.DOACAO, BookStatus.TROCA));
 
         return books.stream()
                 .map(book -> modelMapper.map(book, BookResponseDTO.class))
