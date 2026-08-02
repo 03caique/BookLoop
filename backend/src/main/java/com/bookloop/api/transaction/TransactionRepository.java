@@ -18,4 +18,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     );
 
     Optional<Transaction> findByMatchIdAndProponentId(Long matchId, Long proponentId);
+
+    boolean existsByProponentIdAndRequesterIdOrProponentIdAndRequesterId(
+            Long proponentId,
+            Long requesterId,
+            Long requesterId2,
+            Long proponentId2
+    );
 }

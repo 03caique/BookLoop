@@ -1,5 +1,6 @@
 package com.bookloop.api.match;
 
+import com.bookloop.api.book.BookStatus;
 import com.bookloop.api.bookrequest.BookRequest;
 import com.bookloop.api.bookrequest.BookRequestRepository;
 import com.bookloop.api.bookrequest.BookRequestStatus;
@@ -44,6 +45,10 @@ public class MatchService {
         User userB;
 
         BookRequest reverseRequest = reverseRequests.get(0);
+
+        if (reverseRequest.getBook().getStatus() != BookStatus.TROCA) {
+            return;
+        }
 
         if (requesterId < ownerId) {
             userA = acceptedRequest.getRequester();

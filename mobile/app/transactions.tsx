@@ -12,11 +12,11 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BottomNavigation } from "../components/BottomNavigation";
-import { useMatchesViewModel } from "../viewmodels/useMatchesViewModel";
-import { Palette, Radius, Spacing, FontSize } from "../constants/theme";
+import { FontSize, Palette, Radius, Spacing } from "../constants/theme";
+import { useTransactionsViewModel } from "../viewmodels/useTransactionsViewModel";
 
-export default function MatchesScreen() {
-  const vm = useMatchesViewModel();
+export default function TransactionsScreen() {
+  const vm = useTransactionsViewModel();
   const insets = useSafeAreaInsets();
 
   if (vm.loading) {
@@ -28,7 +28,7 @@ export default function MatchesScreen() {
           end={{ x: 1, y: 0 }}
           style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
         >
-          <Text style={styles.title}>Matches Ativos</Text>
+          <Text style={styles.title}>Transações</Text>
         </LinearGradient>
 
         <View style={styles.centerContent}>
@@ -47,7 +47,7 @@ export default function MatchesScreen() {
           end={{ x: 1, y: 0 }}
           style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
         >
-          <Text style={styles.title}>Matches Ativos</Text>
+          <Text style={styles.title}>Transações</Text>
         </LinearGradient>
 
         <View style={styles.centerContent}>
@@ -79,12 +79,12 @@ export default function MatchesScreen() {
         end={{ x: 1, y: 0 }}
         style={[styles.appBar, { paddingTop: insets.top + Spacing.md }]}
       >
-        <Text style={styles.title}>Matches Ativos</Text>
+        <Text style={styles.title}>Transações</Text>
       </LinearGradient>
 
       <FlatList
-        data={vm.matches}
-        keyExtractor={(item) => item.matchId.toString()}
+        data={vm.transactions}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={styles.list}
         removeClippedSubviews={false}
         refreshing={vm.loading}
@@ -95,9 +95,7 @@ export default function MatchesScreen() {
             <View style={styles.emptyIconCircle}>
               <Feather name="heart" size={48} color={Palette.primaryLight} />
             </View>
-            <Text style={styles.emptyText}>
-              Nenhum match ativo encontrado.
-            </Text>
+            <Text style={styles.emptyText}>Nenhuma transação encontrada.</Text>
           </View>
         }
         renderItem={({ item }) => (
@@ -107,37 +105,78 @@ export default function MatchesScreen() {
                 <Feather name="users" size={20} color={Palette.primaryDark} />
               </View>
               <Text style={styles.userName}>{item.otherUserName}</Text>
+
+              <View
+                style={[
+                  styles.typeBadge,
+                  item.type === "TROCA"
+                    ? styles.typeBadgeTroca
+                    : styles.typeBadgeDoacao,
+                ]}
+              >
+                <Text style={styles.typeBadgeText}>
+                  {item.type === "TROCA" ? "Troca" : "Doação"}
+                </Text>
+              </View>
             </View>
 
-            <View style={styles.exchangeContainer}>
-              <View style={styles.bookBox}>
-                <Text style={styles.label}>Seu livro</Text>
+            {item.type === "TROCA" ? (
+              <View style={styles.exchangeContainer}>
+                <View style={styles.bookBox}>
+                  <Text style={styles.label}>Seu livro</Text>
 
-                <View style={styles.bookRow}>
-                  <Feather name="book-open" size={16} color={Palette.primaryDark} />
+                  <View style={styles.bookRow}>
+                    <Feather
+                      name="book-open"
+                      size={16}
+                      color={Palette.primaryDark}
+                    />
+                    <Text style={styles.bookName} numberOfLines={2}>
+                      {item.myBookTitle}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.exchangeIconCircle}>
+                  <Feather name="repeat" size={20} color={Palette.white} />
+                </View>
+
+                <View style={styles.bookBox}>
+                  <Text style={styles.label}>
+                    Livro de {item.otherUserName}
+                  </Text>
+
+                  <View style={styles.bookRow}>
+                    <Feather name="book" size={16} color={Palette.secondary} />
+                    <Text style={styles.bookName} numberOfLines={2}>
+                      {item.otherBookTitle}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.donationBox}>
+                <View style={styles.donationIconCircle}>
+                  <Feather name="gift" size={20} color={Palette.white} />
+                </View>
+
+                <View style={styles.donationInfo}>
                   <Text style={styles.bookName} numberOfLines={2}>
                     {item.myBookTitle}
                   </Text>
-                </View>
-              </View>
 
-              <View style={styles.exchangeIconCircle}>
-                <Feather name="repeat" size={20} color={Palette.white} />
-              </View>
-
-              <View style={styles.bookBox}>
-                <Text style={styles.label}>
-                  Livro de {item.otherUserName}
-                </Text>
-
-                <View style={styles.bookRow}>
-                  <Feather name="book" size={16} color={Palette.secondary} />
-                  <Text style={styles.bookName} numberOfLines={2}>
-                    {item.otherBookTitle}
+                  <Text style={styles.donationSubtitle}>
+                    {item.transactionStatus === "PENDENTE"
+                      ? item.isProponent
+                        ? `Doação para ${item.otherUserName}`
+                        : `Doação de ${item.otherUserName}`
+                      : item.isProponent
+                        ? `Doado para ${item.otherUserName}`
+                        : `Recebido de ${item.otherUserName}`}
                   </Text>
                 </View>
               </View>
-            </View>
+            )}
 
             <TouchableOpacity
               style={styles.contactButton}
@@ -157,36 +196,82 @@ export default function MatchesScreen() {
                 end={{ x: 1, y: 0 }}
                 style={styles.buttonGradient}
               >
-                <Feather name="message-circle" size={18} color={Palette.white} />
+                <Feather
+                  name="message-circle"
+                  size={18}
+                  color={Palette.white}
+                />
                 <Text style={styles.buttonText}>Entrar em contato</Text>
               </LinearGradient>
             </TouchableOpacity>
-            {item.myTransactionStatus === "PENDENTE" ? (
-              <TouchableOpacity
-                style={styles.confirmButton}
-                onPress={() => vm.confirmDelivery(item.myTransactionId)}
-                disabled={vm.confirmingTransactionId === item.myTransactionId}
-              >
-                <LinearGradient
-                  colors={[Palette.primary, Palette.secondary]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.buttonGradient}
+            {item.isProponent ? (
+              item.transactionStatus === "PENDENTE" ? (
+                <TouchableOpacity
+                  style={styles.confirmButton}
+                  onPress={() => vm.confirmDelivery(item.transactionId)}
+                  disabled={vm.confirmingTransactionId === item.transactionId}
                 >
-                  {vm.confirmingTransactionId === item.myTransactionId ? (
-                    <ActivityIndicator size="small" color={Palette.white} />
-                  ) : (
-                    <>
-                      <Feather name="check-circle" size={18} color={Palette.white} />
-                      <Text style={styles.buttonText}>Confirmar entrega</Text>
-                    </>
-                  )}
-                </LinearGradient>
-              </TouchableOpacity>
+                  <LinearGradient
+                    colors={[Palette.primary, Palette.secondary]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.buttonGradient}
+                  >
+                    {vm.confirmingTransactionId === item.transactionId ? (
+                      <ActivityIndicator size="small" color={Palette.white} />
+                    ) : (
+                      <>
+                        <Feather
+                          name="check-circle"
+                          size={18}
+                          color={Palette.white}
+                        />
+                        <Text style={styles.buttonText}>Confirmar entrega</Text>
+                      </>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.deliveredContainer}>
+                  <Feather
+                    name="check-circle"
+                    size={18}
+                    color={Palette.primaryDark}
+                  />
+                  <Text style={styles.deliveredText}>Entrega confirmada</Text>
+                </View>
+              )
             ) : (
-              <View style={styles.deliveredContainer}>
-                <Feather name="check-circle" size={18} color={Palette.primaryDark} />
-                <Text style={styles.deliveredText}>Entrega confirmada</Text>
+              <View
+                style={[
+                  styles.deliveredContainer,
+                  item.transactionStatus === "PENDENTE" &&
+                    styles.pendingContainer,
+                ]}
+              >
+                <Feather
+                  name={
+                    item.transactionStatus === "PENDENTE"
+                      ? "clock"
+                      : "check-circle"
+                  }
+                  size={18}
+                  color={
+                    item.transactionStatus === "PENDENTE"
+                      ? Palette.warning
+                      : Palette.primaryDark
+                  }
+                />
+                <Text
+                  style={[
+                    styles.deliveredText,
+                    item.transactionStatus === "PENDENTE" && styles.pendingText,
+                  ]}
+                >
+                  {item.transactionStatus === "PENDENTE"
+                    ? "Aguardando confirmação"
+                    : "Entrega confirmada"}
+                </Text>
               </View>
             )}
           </View>
@@ -246,12 +331,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 3,
-  },
-
-  cardHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 18,
   },
 
   avatarCircle: {
@@ -409,5 +488,69 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     overflow: "hidden",
     marginTop: 10,
+  },
+
+  cardHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 18,
+  },
+
+  typeBadge: {
+    marginLeft: "auto",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: Radius.full,
+  },
+
+  typeBadgeTroca: {
+    backgroundColor: Palette.tintLight,
+  },
+
+  typeBadgeDoacao: {
+    backgroundColor: Palette.borderLight,
+  },
+
+  typeBadgeText: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: Palette.primaryDark,
+  },
+
+  donationBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Palette.tintLight,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+
+  donationIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Palette.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+
+  donationInfo: {
+    flex: 1,
+  },
+
+  donationSubtitle: {
+    fontSize: 13,
+    color: Palette.textLabel,
+    marginTop: 2,
+  },
+
+  pendingContainer: {
+    backgroundColor: Palette.warningBg,
+  },
+
+  pendingText: {
+    color: Palette.warning,
   },
 });

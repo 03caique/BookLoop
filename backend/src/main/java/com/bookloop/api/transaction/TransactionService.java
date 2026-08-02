@@ -2,6 +2,7 @@ package com.bookloop.api.transaction;
 
 import com.bookloop.api.book.BookStatus;
 import com.bookloop.api.book.dto.BookResponseDTO;
+import com.bookloop.api.bookrequest.BookRequest;
 import com.bookloop.api.match.Match;
 import com.bookloop.api.match.MatchRepository;
 import com.bookloop.api.match.MatchStatus;
@@ -43,47 +44,76 @@ public class TransactionService {
         }
 
         transaction.getBook().setStatus(BookStatus.ENTREGUE);
-
         transaction.setStatus(TransactionStatus.FINALIZADA);
 
         transactionRepository.save(transaction);
 
         notificationService.createTransactionFinishedNotification(transaction);
 
-        List<Transaction> transactions = transactionRepository.findByMatchId(transaction.getMatch().getId());
+        if (transaction.getMatch() != null) {
+            List<Transaction> transactions = transactionRepository.findByMatchId(transaction.getMatch().getId());
 
-        boolean allCompleted = transactions.stream()
-                .allMatch(t -> t.getStatus() == TransactionStatus.FINALIZADA);
+            boolean allCompleted = transactions.stream().allMatch(t -> t.getStatus() == TransactionStatus.FINALIZADA);
 
-        if (allCompleted) {
+            if (allCompleted) {
+                Match match = transaction.getMatch();
 
-            Match match = transaction.getMatch();
+                match.setStatus(MatchStatus.CONCLUIDO);
 
-            match.setStatus(MatchStatus.CONCLUIDO);
-
-            matchRepository.save(match);
+                matchRepository.save(match);
+            }
         }
     }
 
-    public Page<TransactionResponseDTO> findByUser(Long userId, Pageable pageable) {
-        Page<Transaction> transactions = transactionRepository.findByProponentIdOrRequesterId(userId, userId, pageable);
+    public Page<TransactionResponseDTO> findMyTransactions(Pageable pageable) {
+        User loggedUser = loggedUserService.getLoggedUser();
+
+        Page<Transaction> transactions = transactionRepository.findByProponentIdOrRequesterId(
+                loggedUser.getId(),
+                loggedUser.getId(),
+                pageable);
 
         return transactions.map(transaction -> {
-            TransactionResponseDTO dto = modelMapper.map(
-                    transaction,
-                    TransactionResponseDTO.class
-            );
+            TransactionResponseDTO dto = modelMapper.map(transaction, TransactionResponseDTO.class);
 
-            dto.setMatchId(transaction.getMatch().getId());
+            if (transaction.getMatch() != null) {
+                dto.setMatchId(transaction.getMatch().getId());
+                dto.setType(TransactionType.TROCA);
+            } else {
+                dto.setType(TransactionType.DOACAO);
+            }
+
             dto.setBookId(transaction.getBook().getId());
             dto.setBookTitle(transaction.getBook().getTitle());
+
             dto.setProponentId(transaction.getProponent().getId());
             dto.setProponentName(transaction.getProponent().getName());
+
             dto.setRequesterId(transaction.getRequester().getId());
             dto.setRequesterName(transaction.getRequester().getName());
 
+            if (transaction.getProponent().getId().equals(loggedUser.getId())) {
+                dto.setOtherUserId(transaction.getRequester().getId());
+                dto.setOtherUserName(transaction.getRequester().getName());
+            } else {
+                dto.setOtherUserId(transaction.getProponent().getId());
+                dto.setOtherUserName(transaction.getProponent().getName());
+            }
+
             return dto;
         });
+    }
+
+    public void createDonationTransaction(BookRequest acceptedRequest) {
+        Transaction donationTransaction = new Transaction();
+
+        donationTransaction.setMatch(null);
+        donationTransaction.setBook(acceptedRequest.getBook());
+        donationTransaction.setProponent(acceptedRequest.getBook().getUser());
+        donationTransaction.setRequester(acceptedRequest.getRequester());
+        donationTransaction.setStatus(TransactionStatus.PENDENTE);
+
+        transactionRepository.save(donationTransaction);
     }
 
 }

@@ -3,10 +3,14 @@ export type TransactionStatus=
 | "FINALIZADA"
 | "CANCELADA";
 
+export type TransactionType=
+| "TROCA"
+| "DOACAO"
+
 export interface Transaction{
     id: number;
     status: TransactionStatus;
-    matchId: number;
+    matchId: number | null;
     bookId: number;
     bookTitle: string;
     proponentId: number;
@@ -14,4 +18,7 @@ export interface Transaction{
     requesterId: number;
     requesterName: string;
     createdAt: string | null;
+    type: TransactionType;
+    otherUserId: number;
+    otherUserName: string;
 }

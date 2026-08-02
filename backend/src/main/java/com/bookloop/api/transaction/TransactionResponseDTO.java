@@ -19,5 +19,8 @@ public class TransactionResponseDTO {
     private Long requesterId;
     private String requesterName;
     private LocalDateTime createdAt;
+    private TransactionType type;
+    private Long otherUserId;
+    private String otherUserName;
 
 }

@@ -27,9 +27,8 @@ public class Transaction {
     @NotNull
     private TransactionStatus status;
 
-    @NotNull
     @ManyToOne
-    @JoinColumn(name = "match_id")
+    @JoinColumn(name = "match_id", nullable = true)
     private Match match;
 
     @NotNull

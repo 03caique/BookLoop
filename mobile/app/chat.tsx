@@ -52,7 +52,7 @@ export default function Chat() {
             <TouchableOpacity
               style={styles.backButton}
               onPress={() =>
-                router.canGoBack() ? router.back() : router.replace("/matches")
+                router.canGoBack() ? router.back() : router.replace("/transactions")
               }
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >

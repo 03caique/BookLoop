@@ -1,11 +1,10 @@
 package com.bookloop.api.chat;
 
-import com.bookloop.api.book.dto.BookResponseDTO;
 import com.bookloop.api.chat.dto.MessageRequestDTO;
 import com.bookloop.api.chat.dto.MessageResponseDTO;
 import com.bookloop.api.match.MatchRepository;
-import com.bookloop.api.match.MatchService;
 import com.bookloop.api.security.LoggedUserService;
+import com.bookloop.api.transaction.TransactionRepository;
 import com.bookloop.api.user.User;
 import com.bookloop.api.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -13,14 +12,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,8 +26,8 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    private final MatchRepository matchRepository;
     private final LoggedUserService loggedUserService;
+    private final TransactionRepository transactionRepository;
 
     public MessageResponseDTO create(MessageRequestDTO requestDTO){
         User loggedUser = loggedUserService.getLoggedUser();
@@ -43,11 +39,7 @@ public class ChatService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Não é possível enviar mensagens para si mesmo.");
         }
 
-        Long userAId = Math.min(loggedUser.getId(), receiver.getId());
-        Long userBId = Math.max(loggedUser.getId(), receiver.getId());
-        if (!matchRepository.existsByUserAIdAndUserBId(userAId, userBId)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Os usuários não possuem um match ativo");
-        }
+        validateConversation(loggedUser, receiver);
 
         Message message = new Message();
 
@@ -73,11 +65,7 @@ public class ChatService {
         User receiver = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
-        Long userAId = Math.min(loggedUser.getId(), receiver.getId());
-        Long userBId = Math.max(loggedUser.getId(), receiver.getId());
-        if (!matchRepository.existsByUserAIdAndUserBId(userAId, userBId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Os usuários não possuem um match ativo");
-        }
+        validateConversation(loggedUser, receiver);
 
         Page<Message> messages = messageRepository.findBySenderIdAndReceiverIdOrSenderIdAndReceiverIdOrderBySentAtAsc(
                 loggedUser.getId(),
@@ -104,12 +92,7 @@ public class ChatService {
         User receiver = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
 
-        Long userAId = Math.min(loggedUser.getId(), receiver.getId());
-        Long userBId = Math.max(loggedUser.getId(), receiver.getId());
-
-        if (!matchRepository.existsByUserAIdAndUserBId(userAId, userBId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Os usuários não possuem um match ativo");
-        }
+        validateConversation(loggedUser, receiver);
 
         List<Message> messages = messageRepository.findNewMessages(loggedUser.getId(), receiver.getId(), after);
 
@@ -126,4 +109,18 @@ public class ChatService {
         }).collect(Collectors.toList());
     }
 
+    private void validateConversation(User loggedUser, User receiver) {
+
+        if (!transactionRepository.existsByProponentIdAndRequesterIdOrProponentIdAndRequesterId(
+                loggedUser.getId(),
+                receiver.getId(),
+                receiver.getId(),
+                loggedUser.getId())) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "Os usuários não possuem uma negociação ativa."
+            );
+        }
+    }
 }

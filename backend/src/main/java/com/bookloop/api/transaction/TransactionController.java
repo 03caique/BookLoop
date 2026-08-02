@@ -19,8 +19,8 @@ public class TransactionController {
         transactionService.confirmDelivery(id);
     }
 
-    @GetMapping
-    public Page<TransactionResponseDTO> findByUser(@RequestParam Long usuarioId, Pageable pageable) {
-        return transactionService.findByUser(usuarioId, pageable);
+    @GetMapping("/my")
+    public Page<TransactionResponseDTO> findMyTransactions(Pageable pageable) {
+        return transactionService.findMyTransactions(pageable);
     }
 }

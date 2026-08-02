@@ -1,23 +1,19 @@
 import api from "./api";
-import{ Transaction }from "../models/Transaction";
+import { Transaction } from "../models/Transaction";
 
-export async function getTransactionByUser(
-    userId: number
-): Promise<Transaction[]>{
+async function getMyTransactions(): Promise<Transaction[]> {
+  const response = await api.get("/api/transactions/my");
 
-    const response=await api.get(
-        "/api/transactions",
-        {
-            params: {
-                usuarioId: userId
-            },
-        }
-    );
-    return response.data.content;
+  return response.data.content;
+}
+
+async function confirmDelivery(
+  transactionId: number
+): Promise<void> {
+  await api.put(`/api/transactions/${transactionId}/confirmar`);
 }
 
 export const transactionService = {
-  async confirmDelivery(transactionId: number): Promise<void> {
-    await api.put(`/api/transactions/${transactionId}/confirmar`);
-  },
+  getMyTransactions,
+  confirmDelivery,
 };
