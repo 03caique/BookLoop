@@ -62,7 +62,11 @@ public class UserService {
             user.setName(updateDTO.getName());
         }
 
-        if (updateDTO.getEmail() != null){
+        if (updateDTO.getEmail() != null) {
+            if (!updateDTO.getEmail().equals(user.getEmail()) && userRepository.existsByEmail(updateDTO.getEmail())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "E-mail já cadastrado");
+            }
+
             user.setEmail(updateDTO.getEmail());
         }
 

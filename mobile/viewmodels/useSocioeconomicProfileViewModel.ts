@@ -16,6 +16,15 @@ export function useSocioeconomicProfileViewModel() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  function parseFormattedNumber(value: string): number {
+    if (!value) return 0;
+    
+    const cleanString = value.replace(/\./g, "").replace(",", ".");
+    
+    const parsed = Number(cleanString);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
   async function loadProfile() {
     try {
       setLoading(true);
@@ -29,7 +38,7 @@ export function useSocioeconomicProfileViewModel() {
 
       const profile = await getSocioeconomicProfile(Number(userId));
 
-      setFamilyIncome(profile.familyIncome.toString());
+      setFamilyIncome(profile.familyIncome ? profile.familyIncome.toString().replace(".", ",") : "");
       setEducationLevel(profile.educationLevel);
       setHouseholdSize(profile.householdSize.toString());
       setWorkSituation(profile.workSituation);
@@ -47,14 +56,20 @@ export function useSocioeconomicProfileViewModel() {
       console.error(error);
       Alert.alert("Erro", "Não foi possível carregar o perfil socioeconômico.");
     } finally {
-      setLoading(false); // 👈 faltava isso
+      setLoading(false);
     }
   }
 
   async function handleSubmit() {
     if (!familyIncome || !educationLevel || !householdSize || !workSituation) {
       Alert.alert("Erro", "Preencha todos os campos");
+      return;
+    }
 
+    const incomeNumber = parseFormattedNumber(familyIncome);
+
+    if (incomeNumber <= 0) {
+      Alert.alert("Erro", "Informe um valor de renda válido.");
       return;
     }
 
@@ -63,7 +78,7 @@ export function useSocioeconomicProfileViewModel() {
 
       await createSocioeconomicProfile({
         id: 0,
-        familyIncome: Number(familyIncome),
+        familyIncome: incomeNumber, 
         educationLevel,
         householdSize: Number(householdSize),
         workSituation,
@@ -72,7 +87,6 @@ export function useSocioeconomicProfileViewModel() {
       Alert.alert("Sucesso", "Perfil socioeconômico cadastrado!");
     } catch (error) {
       console.error(error);
-
       Alert.alert("Erro", "Não foi possível salvar os dados");
     } finally {
       setLoading(false);
@@ -82,7 +96,13 @@ export function useSocioeconomicProfileViewModel() {
   async function handleUpdate() {
     if (!familyIncome || !educationLevel || !householdSize || !workSituation) {
       Alert.alert("Erro", "Preencha todos os campos");
+      return;
+    }
 
+    const incomeNumber = parseFormattedNumber(familyIncome);
+
+    if (incomeNumber <= 0) {
+      Alert.alert("Erro", "Informe um valor de renda válido.");
       return;
     }
 
@@ -97,7 +117,7 @@ export function useSocioeconomicProfileViewModel() {
       }
 
       await updateSocioeconomicProfile(Number(userId), {
-        familyIncome: Number(familyIncome),
+        familyIncome: incomeNumber,
         educationLevel,
         householdSize: Number(householdSize),
         workSituation,
@@ -106,7 +126,6 @@ export function useSocioeconomicProfileViewModel() {
       Alert.alert("Sucesso", "Perfil socioeconômico atualizado!");
     } catch (error) {
       console.error(error);
-
       Alert.alert("Erro", "Não foi possível atualizar os dados.");
     } finally {
       setLoading(false);
@@ -127,7 +146,6 @@ export function useSocioeconomicProfileViewModel() {
     setWorkSituation,
 
     loading,
-
     editing,
 
     loadProfile,

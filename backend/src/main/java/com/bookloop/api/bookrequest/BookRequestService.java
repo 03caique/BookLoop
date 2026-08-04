@@ -42,34 +42,35 @@ public class BookRequestService {
     private final TransactionService transactionService;
 
     public BookRequestResponseDTO create(BookRequestRequestDTO dto) {
+        User loggedUser = loggedUserService.getLoggedUser();
 
-        Book book = bookRepository.findById(dto.getBookId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));
+        Book book = bookRepository.findById(dto.getBookId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));
 
-        User requester = userRepository.findById(dto.getRequesterId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado"));
+        if (book.getStatus() != BookStatus.DOACAO && book.getStatus() != BookStatus.TROCA) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este livro não está mais disponível para solicitação");
+        }
 
-        if (book.getUser().getId().equals(dto.getRequesterId())) {
+        if (book.getUser().getId().equals(loggedUser.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não pode solicitar seu próprio livro");
         }
 
         if (bookRequestRepository.existsByBookIdAndRequesterIdAndStatusIn(
                 dto.getBookId(),
-                dto.getRequesterId(),
+                loggedUser.getId(),
                 List.of(
                         BookRequestStatus.PENDENTE,
                         BookRequestStatus.ACEITA,
                         BookRequestStatus.RECUSADA
                 )
         )) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Solicitação já enviada"
-            );
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Solicitação já enviada");
         }
 
         BookRequest request = new BookRequest();
 
         request.setBook(book);
-        request.setRequester(requester);
+        request.setRequester(loggedUser);
         request.setStatus(BookRequestStatus.PENDENTE);
 
         BookRequest savedRequest = bookRequestRepository.save(request);
@@ -77,14 +78,22 @@ public class BookRequestService {
 
         BookRequestResponseDTO responseDTO = modelMapper.map(savedRequest, BookRequestResponseDTO.class);
         responseDTO.setBookId(book.getId());
-        responseDTO.setRequesterId(requester.getId());
+        responseDTO.setRequesterId(loggedUser.getId());
 
         return responseDTO;
     }
 
     public Page<BookRequestResponseDTO> findByProponent(Long proponentId, Pageable pageable) {
-        List<BookRequest> bookRequests = bookRequestRepository.findByBookUserIdAndStatus(proponentId, BookRequestStatus.PENDENTE);
+        User loggedUser = loggedUserService.getLoggedUser();
 
+        if (!loggedUser.getId().equals(proponentId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não possui permissão para visualizar essas solicitações");
+        }
+
+        List<BookRequest> bookRequests = bookRequestRepository.findByBookUserIdAndStatus(
+                proponentId,
+                BookRequestStatus.PENDENTE
+        );
         List<PrioritizedBookRequest> prioritizedRequests = bookRequests.stream().map(bookRequest -> {
             Integer priority = socioeconomicProfileRepository
                     .findByUserId(bookRequest.getRequester().getId())
@@ -144,6 +153,13 @@ public class BookRequestService {
 
         if (updateDTO.getStatus() != BookRequestStatus.ACEITA && updateDTO.getStatus() != BookRequestStatus.RECUSADA){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Você não possui permissão para alterar a solicitação para esse status");
+        }
+
+        if (bookRequest.getStatus() != BookRequestStatus.PENDENTE) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Somente solicitações pendentes podem ser alteradas"
+            );
         }
 
         bookRequest.setStatus(updateDTO.getStatus());

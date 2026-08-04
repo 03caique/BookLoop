@@ -5,12 +5,15 @@ import com.bookloop.api.bookrequest.BookRequest;
 import com.bookloop.api.bookrequest.BookRequestRepository;
 import com.bookloop.api.bookrequest.BookRequestStatus;
 import com.bookloop.api.notification.NotificationService;
+import com.bookloop.api.security.LoggedUserService;
 import com.bookloop.api.transaction.Transaction;
 import com.bookloop.api.transaction.TransactionRepository;
 import com.bookloop.api.transaction.TransactionStatus;
 import com.bookloop.api.user.User;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class MatchService {
     private final BookRequestRepository bookRequestRepository;
     private final NotificationService notificationService;
     private final TransactionRepository transactionRepository;
+    private final LoggedUserService loggedUserService;
 
     public void checkForMatch(BookRequest acceptedRequest) {
 
@@ -105,12 +109,15 @@ public class MatchService {
     }
 
     public List<MatchResponseDTO> findMatchesByUser(Long userId) {
+        User loggedUser = loggedUserService.getLoggedUser();
 
-        List<Match> matches = matchRepository.findMatchesByUser(userId);
+        if (!loggedUser.getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não possui permissão para visualizar esses matches");
+        }
 
-        return matches.stream()
-                .map(match -> toResponse(match, userId))
-                .toList();
+        List<Match> matches = matchRepository.findMatchesByUser(loggedUser.getId());
+
+        return matches.stream().map(match -> toResponse(match, loggedUser.getId())).toList();
     }
 
     private MatchResponseDTO toResponse(Match match, Long userId) {
